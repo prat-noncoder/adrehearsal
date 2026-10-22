@@ -46,23 +46,30 @@ export function deriveTraits(person: Person): Traits {
   const socialInfluence = clip(
     C.SOCIAL_MID + noise(person, TRAIT_ID.social, C.SOCIAL_NOISE),
   );
+  // People with AI scores: blend each score (1 to 5 -> 0 to 1) with the rule value.
+  // People without: the rule values are used alone.
+  const ai = person.ai;
+  const blend = (aiScore: number | undefined, rule: number) =>
+    aiScore === undefined
+      ? rule
+      : clip(C.AI_BLEND_AI * ((aiScore - 1) / 4) + C.AI_BLEND_RULE * rule);
+  const blended = {
+    priceSensitivity: blend(ai?.ps, priceSensitivity),
+    skepticism: blend(ai?.sk, skepticism),
+    noveltySeeking: blend(ai?.nv, noveltySeeking),
+    impulsivity: blend(ai?.im, impulsivity),
+    attentionBaseline: blend(ai?.at, attentionBaseline),
+    socialInfluence: blend(ai?.si, socialInfluence),
+  };
   const g = C.CLICK_GAIN;
   const clickGain = clip(
     g.base +
-      g.novelty * noveltySeeking +
-      g.social * socialInfluence +
-      g.impulsivity * impulsivity +
-      g.skepticism * skepticism,
+      g.novelty * blended.noveltySeeking +
+      g.social * blended.socialInfluence +
+      g.impulsivity * blended.impulsivity +
+      g.skepticism * blended.skepticism,
     g.min,
     g.max,
   );
-  return {
-    priceSensitivity,
-    skepticism,
-    noveltySeeking,
-    impulsivity,
-    attentionBaseline,
-    socialInfluence,
-    clickGain,
-  };
+  return { ...blended, clickGain };
 }

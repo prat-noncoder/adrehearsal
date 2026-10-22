@@ -35,6 +35,16 @@ export type MoodName =
 
 export type Cause = FrictionTag | "not_relevant" | "lost_interest";
 
+/** AI trait scores, 1 to 5, after the leftover gender effect was removed (see scripts/build_bank_json.py). */
+export interface AiScores {
+  ps: number; // price sensitivity
+  sk: number; // skepticism
+  nv: number; // novelty seeking
+  im: number; // impulsivity
+  at: number; // attention
+  si: number; // social influence
+}
+
 export interface Person {
   /** Row number in the bank. Stable, so the same person always gets the same random draws. */
   index: number;
@@ -47,7 +57,9 @@ export interface Person {
   tier: string;
   incomeLevel: number;
   weight: number;
-  /** Added later (M2) from AI labels. Until then undefined. */
+  /** Only some people have AI labels. Everyone works without them. */
+  ai?: AiScores;
+  /** Up to 3 of the 22 ad categories, most likely first. */
   interests?: string[];
   meta?: "high" | "medium" | "low";
 }

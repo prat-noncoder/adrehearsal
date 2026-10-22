@@ -30,6 +30,10 @@ export const NOVELTY_NOISE = 0.12; // ASSUMED
 export const SOCIAL_MID = 0.5; // ASSUMED
 export const SOCIAL_NOISE = 0.15; // ASSUMED
 
+// For people with AI scores: trait = clip(AI_BLEND_AI x AI score (rescaled to 0..1) + AI_BLEND_RULE x rule value).
+export const AI_BLEND_AI = 0.75; // ASSUMED
+export const AI_BLEND_RULE = 0.25; // ASSUMED: keeps an objective anchor in income and age
+
 // click_gain = clip(1 + 0.35 x novelty + 0.25 x social + 0.20 x impulsivity - 0.45 x skepticism, 0.2, 1.8)
 export const CLICK_GAIN = {
   base: 1, // ASSUMED

@@ -2,6 +2,8 @@
 
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { bankFromRaw } from "./bank.ts";
+import type { RawBankPerson } from "./bank.ts";
 import type { Archetype } from "./labels.ts";
 import type { Person } from "./types.ts";
 
@@ -61,6 +63,13 @@ export function loadBank(path: string = DEFAULT_BANK_PATH): Person[] {
     incomeLevel: Number(r.income_level),
     weight: Number(r.population_weight),
   }));
+}
+
+export const DEFAULT_BANK_JSON_PATH = resolve(process.cwd(), "data/bank.json");
+
+/** The bank the website uses: includes AI scores, interests and the social-media label. */
+export function loadBankJson(path: string = DEFAULT_BANK_JSON_PATH): Person[] {
+  return bankFromRaw(JSON.parse(readFileSync(path, "utf8")) as RawBankPerson[]);
 }
 
 export function loadArchetypes(path: string = DEFAULT_ARCHETYPES_PATH): Archetype[] {
