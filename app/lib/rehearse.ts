@@ -314,7 +314,8 @@ export async function rehearse(req: RehearseRequest, deps: RehearseDeps): Promis
     const chunk = timeline.chunks[e];
     const within = uniform(req.seed, STREAM.display, v.person.index);
     return {
-      exitS: Math.round((chunk.startS + within * (chunk.endS - chunk.startS)) * 10) / 10,
+      // Never exactly 0, so nobody is already gone before the ad starts.
+      exitS: Math.max(0.1, Math.round((chunk.startS + within * (chunk.endS - chunk.startS)) * 10) / 10),
       cause: causeOfExit(chunk, v),
     };
   });

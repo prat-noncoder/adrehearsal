@@ -76,6 +76,10 @@ export default function Report({ data, onAgain }: { data: RehearseResponse; onAg
   }, [data.groups]);
 
   const cost = data.costInfo.totalCostUsd;
+  const tokens = [data.costInfo.readAd, data.costInfo.reasons].reduce(
+    (n, p) => n + (p ? p.promptTokens + p.completionTokens : 0),
+    0,
+  );
 
   return (
     <section id="report" aria-live="polite">
@@ -170,7 +174,10 @@ export default function Report({ data, onAgain }: { data: RehearseResponse; onAg
         <p className="small" style={{ marginTop: 12 }}>
           Panel: {data.panel.used} viewers used of {data.panel.requested} requested. Seed {data.seed} (the same ad and settings give the
           same result). AI model: {data.costInfo.model}.
-          {cost !== null && ` AI cost reported for this run: about $${cost.toFixed(4)}.`}
+          {` AI use this run: ${tokens.toLocaleString()} tokens.`}
+          {cost !== null && cost > 0
+            ? ` Cost reported by OpenRouter: about $${cost.toFixed(4)}.`
+            : " OpenRouter reported no cost for this run (it may not show real billing)."}
         </p>
       </div>
 
