@@ -1,9 +1,9 @@
 // Person traits from simple rules on income and age, plus seeded noise. Sex is never used.
 // (The AI-score blend is added later; until a person has AI scores, these rules are used alone.)
 
-import * as C from "./constants";
-import { clip, normal, STREAM } from "./rng";
-import type { Person, Traits } from "./types";
+import * as C from "./constants.ts";
+import { clip, normal, STREAM } from "./rng.ts";
+import type { Person, Traits } from "./types.ts";
 
 // One number per trait so each trait gets its own noise.
 const TRAIT_ID = {

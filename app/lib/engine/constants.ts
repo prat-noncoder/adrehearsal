@@ -2,7 +2,7 @@
 // "ASSUMED" = a starting guess from docs/ENGINE_SPEC.md, not measured on real ad results.
 // Nothing here is a prediction of sales. These numbers shape a simulation only.
 
-import type { FrictionTag, MoodName } from "./types";
+import type { FrictionTag, MoodName } from "./types.ts";
 
 // ---------- Random seeds ----------
 // A person's traits are a property of the person, so they use one fixed seed (ASSUMED choice).

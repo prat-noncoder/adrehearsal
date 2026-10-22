@@ -1,8 +1,8 @@
 // Attention per 3-second chunk, and the skip habit.
 
-import * as C from "./constants";
-import { clip } from "./rng";
-import type { Traits } from "./types";
+import * as C from "./constants.ts";
+import { clip } from "./rng.ts";
+import type { Traits } from "./types.ts";
 
 /** Attention going into the first chunk: attention baseline times patience. */
 export function startAttention(traits: Traits, patience: number): number {

@@ -1,8 +1,8 @@
 // Moods: drawn once per person per run from the seed, then turned into numbers the maths uses.
 
-import * as C from "./constants";
-import { clip, STREAM, uniform } from "./rng";
-import type { MoodName, Traits } from "./types";
+import * as C from "./constants.ts";
+import { clip, STREAM, uniform } from "./rng.ts";
+import type { MoodName, Traits } from "./types.ts";
 
 const MOOD_ORDER = Object.keys(C.MOOD_ODDS) as MoodName[];
 

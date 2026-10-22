@@ -1,9 +1,9 @@
 // Funnel (hook, hold, tap) and the calibration that sets the hook-chunk constant.
 
-import * as C from "./constants";
-import { exitChunk } from "./exits";
-import { STREAM, uniform, clip } from "./rng";
-import type { Chunk, Timeline, Viewer } from "./types";
+import * as C from "./constants.ts";
+import { exitChunk } from "./exits.ts";
+import { STREAM, uniform, clip } from "./rng.ts";
+import type { Chunk, Timeline, Viewer } from "./types.ts";
 
 export interface Funnel {
   /** Share still watching at second 3 (after the first chunk). */

@@ -1,10 +1,10 @@
 // Panel: filter the bank by audience, pick the requested number of people, and turn them into viewers.
 
-import * as C from "./constants";
-import { drawMood } from "./moods";
-import { STREAM, uniform } from "./rng";
-import { deriveTraits } from "./traits";
-import type { Person, Viewer } from "./types";
+import * as C from "./constants.ts";
+import { drawMood } from "./moods.ts";
+import { STREAM, uniform } from "./rng.ts";
+import { deriveTraits } from "./traits.ts";
+import type { Person, Viewer } from "./types.ts";
 
 export interface AudienceFilter {
   ageBands?: string[];

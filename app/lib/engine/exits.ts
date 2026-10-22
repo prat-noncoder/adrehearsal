@@ -1,11 +1,11 @@
 // Exits: the chance of leaving in each chunk, and the seeded draw that decides it.
 // Plain maths only. The AI never decides who leaves.
 
-import { nextAttention, skipHabit, startAttention } from "./attention";
-import * as C from "./constants";
-import { applyMood } from "./moods";
-import { STREAM, uniform } from "./rng";
-import type { Chunk, Friction, Timeline, Viewer } from "./types";
+import { nextAttention, skipHabit, startAttention } from "./attention.ts";
+import * as C from "./constants.ts";
+import { applyMood } from "./moods.ts";
+import { STREAM, uniform } from "./rng.ts";
+import type { Chunk, Friction, Timeline, Viewer } from "./types.ts";
 
 /** The trait value a friction tag leans on, for one viewer. */
 function frictionTraitValue(

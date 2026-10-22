@@ -1,8 +1,8 @@
 // Reasons (structure only). The AI writes the sentence later; here we only count causes.
 
-import * as C from "./constants";
-import { frictionTerms } from "./exits";
-import type { Cause, Chunk, Timeline, Viewer } from "./types";
+import * as C from "./constants.ts";
+import { frictionTerms } from "./exits.ts";
+import type { Cause, Chunk, Timeline, Viewer } from "./types.ts";
 
 export type Agreement = "strong" | "medium" | "weak";
 

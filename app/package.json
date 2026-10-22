@@ -1,11 +1,13 @@
 {
   "name": "adrehearsal",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "demo": "node lib/engine/demo.ts"
   },
   "dependencies": {
     "next": "^16.4.2",

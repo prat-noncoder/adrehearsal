@@ -1,7 +1,7 @@
 // Report label: the closest of the 25 shopper types, by the six traits.
 // It is only a name for the report. It is repeatable and never used in the maths.
 
-import type { Traits } from "./types";
+import type { Traits } from "./types.ts";
 
 export interface Archetype {
   id: string;
