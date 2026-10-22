@@ -159,6 +159,14 @@ export const NOT_RELEVANT_BELOW = 0.35; // ASSUMED: with no friction tags, leave
 export const AGREEMENT_STRONG = 0.4; // ASSUMED: share of a window's leavers
 export const AGREEMENT_MEDIUM = 0.2; // ASSUMED
 
+// ---------- Audience income groups ----------
+// income_level (1 to 5) is formula-assigned in the bank, not measured. These groupings are ASSUMED.
+export const INCOME_GROUPS: Record<"lower" | "middle" | "upper", number[]> = {
+  lower: [1, 2],
+  middle: [3],
+  upper: [4, 5],
+};
+
 // ---------- Panel ----------
 export const PANEL_MIN = 200;
 export const PANEL_DEFAULT = 400;

@@ -45,6 +45,7 @@ export const STREAM = {
   tap: 4,
   panel: 5,
   shuffle: 6,
+  display: 7, // only used to place a leaver's dot inside their 3-second window; never decides who leaves
 } as const;
 
 export function clip(x: number, lo = 0, hi = 1): number {
