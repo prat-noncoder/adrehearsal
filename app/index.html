@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AdRehearsal prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --ink:#161a2b; --muted:#5a6075; --line:#d9dce6;
+  --watch:#0f7a85; --gone:#c9ced9; --pick:#e89b00; --pick-ink:#6b4500; --warn-bg:#fff3d6; --warn-ink:#5b3d00;
+  --radius:10px; color-scheme:light;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f131c; --surface:#171c28; --ink:#eceef5; --muted:#9aa1b5; --line:#2b3243;
+    --watch:#3fc1cc; --gone:#2f3648; --pick:#ffb81f; --pick-ink:#ffd98a; --warn-bg:#3a2d0c; --warn-ink:#ffe3a3; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f131c; --surface:#171c28; --ink:#eceef5; --muted:#9aa1b5; --line:#2b3243;
+  --watch:#3fc1cc; --gone:#2f3648; --pick:#ffb81f; --pick-ink:#ffd98a; --warn-bg:#3a2d0c; --warn-ink:#ffe3a3; color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque","IBM Plex Sans",system-ui,sans-serif;line-height:1.12;margin:0}
+.wrap{max-width:880px;margin:0 auto;padding:0 20px 56px}
+.banner{background:var(--warn-bg);color:var(--warn-ink);padding:10px 20px;font-size:14px;border-bottom:1px solid var(--line)}
+.banner b{font-weight:600}
+header{padding:44px 0 26px}
+h1{font-size:clamp(30px,6vw,48px);font-weight:700;max-width:16ch;letter-spacing:-.01em}
+.lede{color:var(--muted);max-width:56ch;margin:14px 0 0;font-size:18px}
+section{margin-top:34px}
+h2{font-size:24px;font-weight:700;margin-bottom:6px}
+.help{color:var(--muted);margin:0 0 16px;max-width:62ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+.drop{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+label.pick{display:inline-block;padding:10px 16px;border-radius:8px;border:1.5px dashed var(--muted);cursor:pointer;font-weight:500}
+label.pick:hover,label.pick:focus-within{border-color:var(--watch);color:var(--watch)}
+input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+#fileNote{color:var(--muted);font-size:14px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:18px}
+.fields label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted)}
+select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+button{font:inherit;cursor:pointer}
+.go{margin-top:20px;background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:12px 22px;font-weight:600}
+.go:hover{opacity:.9}
+:focus-visible{outline:3px solid var(--pick);outline-offset:2px}
+.small{font-size:13px;color:var(--muted)}
+#report{display:none}
+#report.on{display:block}
+#running{display:none;margin-top:18px;color:var(--muted)}
+.key{display:flex;flex-wrap:wrap;gap:22px;margin:4px 0 18px}
+.key div{min-width:130px}
+.key strong{display:block;font:700 34px/1.1 "Bricolage Grotesque",system-ui,sans-serif}
+.key span{font-size:13px;color:var(--muted)}
+.headline{font:700 clamp(21px,3.6vw,28px)/1.2 "Bricolage Grotesque",system-ui,sans-serif;margin:0 0 6px;max-width:30ch}
+#seats{display:grid;grid-template-columns:repeat(25,1fr);gap:5px;margin:6px 0 16px}
+#seats i{aspect-ratio:1;border-radius:50%;background:var(--watch);transition:background .25s,opacity .25s;display:block}
+#seats i.gone{background:var(--gone);opacity:.55}
+#seats i.now{background:var(--pick);opacity:1}
+.scrub{display:flex;align-items:center;gap:12px}
+#play{background:var(--surface);color:var(--ink);border:1.5px solid var(--ink);border-radius:8px;padding:6px 14px;font-weight:600;min-width:84px}
+input[type=range]{flex:1;accent-color:var(--pick)}
+#clock{font-weight:600;min-width:54px;text-align:right}
+#count{margin:10px 0 0}
+.curve{margin-top:14px}
+svg{width:100%;height:auto;display:block}
+.axis{stroke:var(--line);stroke-width:1}
+.line{fill:none;stroke:var(--watch);stroke-width:2.5}
+.mark{stroke:var(--pick);stroke-width:2}
+.lab{fill:var(--muted);font:11px "IBM Plex Sans",system-ui,sans-serif}
+ul.why{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:10px}
+ul.why li{border-left:4px solid var(--pick);padding:6px 12px;background:var(--bg);border-radius:0 8px 8px 0}
+ul.why .n{font-weight:600}
+.tag{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:99px;padding:1px 9px;margin-left:6px;color:var(--muted)}
+.tag.s{border-color:var(--watch);color:var(--watch)}
+.tag.sample{border-color:var(--pick);color:var(--pick-ink)}
+.steps{margin:0;padding-left:20px}
+.steps li{margin:6px 0}
+a{color:var(--watch)}
+@media (prefers-reduced-motion:reduce){#seats i{transition:none}}
+</style>
+</head>
+<body>
+<div class="banner"><b>Prototype with sample data.</b> The real engine is not connected yet, so the numbers below are made up to show the flow. Nothing here predicts sales.</div>
+<div class="wrap">
+<header>
+  <h1>See where people leave your ad, and why, before you spend.</h1>
+  <p class="lede">Upload an ad, say who it’s for, and watch a panel of simulated Indian viewers react to it, second by second.</p>
+</header>
+
+<section id="setup">
+  <h2>Set up the rehearsal</h2>
+  <p class="help">Pick your ad and your audience. In this prototype the file stays on your device and isn’t analysed, and the audience choices don’t change the sample result yet.</p>
+  <div class="panel">
+    <div class="drop">
+      <label class="pick" for="file">Choose an ad (video or image)</label>
+      <input id="file" type="file" accept="video/*,image/*">
+      <span id="fileNote">No file chosen. A sample ad will be used.</span>
+    </div>
+    <div class="fields">
+      <label>Age<select><option>18 to 24</option><option selected>25 to 34</option><option>35 to 44</option><option>45 and over</option></select></label>
+      <label>Gender<select><option selected>Any</option><option>Women</option><option>Men</option></select></label>
+      <label>City type<select><option selected>Any</option><option>Metro</option><option>Other city</option><option>Rural</option></select></label>
+      <label>Income band<select><option selected>Any</option><option>Under ₹15k a month</option><option>₹15k to ₹35k</option><option>₹35k to ₹75k</option><option>₹75k and above</option></select></label>
+      <label>Panel size<select><option>200</option><option selected>400</option><option>1,000</option></select></label>
+    </div>
+    <button class="go" id="run" type="button">Run the rehearsal</button>
+    <p id="running" role="status">Gathering 400 viewers and playing the ad…</p>
+  </div>
+</section>
+
+<section id="report" aria-live="polite">
+  <h2>The report <span class="tag sample">sample data</span></h2>
+  <p class="headline" id="headline"></p>
+  <p class="help">Each dot is one viewer. Drag the slider through the ad, or press Play, and watch who is still watching.</p>
+  <div class="panel">
+    <div class="key">
+      <div><strong id="kHook"></strong><span>still watching at 3 seconds (the hook)</span></div>
+      <div><strong id="kHold"></strong><span>still watching at 15 seconds (the hold)</span></div>
+      <div><strong id="kTap"></strong><span>would tap to learn more (stated intent)</span></div>
+    </div>
+    <div id="seats" aria-hidden="true"></div>
+    <div class="scrub">
+      <button id="play" type="button">Play</button>
+      <input id="t" type="range" min="0" max="30" step="0.5" value="0" aria-label="Seconds into the ad">
+      <span id="clock">0:00</span>
+    </div>
+    <p id="count" aria-live="polite"></p>
+    <div class="curve">
+      <svg id="curve" viewBox="0 0 320 130" role="img" aria-label="Chart of how many viewers are still watching over 30 seconds"></svg>
+    </div>
+  </div>
+
+  <h2 style="margin-top:28px">Why people left</h2>
+  <p class="help" id="whyTitle"></p>
+  <div class="panel"><ul class="why" id="why"></ul></div>
+  <p class="small" style="margin-top:10px">Agreement shows how many of the people who left in this window gave the same reason. Reasons here are sample text. In the real version each one is written for the person who left and tied to what was on screen at that second.</p>
+</section>
+
+<section>
+  <h2>How the real version will work</h2>
+  <ol class="steps">
+    <li>A vision AI watches your ad and writes a timeline of what is on screen and what is said.</li>
+    <li>A panel is drawn from about 20,000 synthetic Indian people, each with an income band, a shopper type and a mood that day.</li>
+    <li>Plain maths, not AI, decides who stops watching and when. The AI cannot flatter the result.</li>
+    <li>An AI writes one short reason for each person who left, tied to that second.</li>
+    <li>Everything simulated or assumed is labelled on the page.</li>
+  </ol>
+  <p class="small">Built so far: the people bank and shopper types. Not connected yet: the ad-reading AI, the exit maths and live uploads. Code and history: <a href="https://github.com/prat-noncoder/adrehearsal">github.com/prat-noncoder/adrehearsal</a></p>
+</section>
+</div>
+
+<script>
+(function(){
+  var WINDOWS=[
+    {r:[["The opening looked like every other sale ad",61],["Nothing on screen explained what was being sold",38],["This isn’t for me",19]]},
+    {r:[["A discount was shown with no reason to believe it",24],["The presenter spoke too fast to follow",17],["The price appeared before I knew the product",11]]},
+    {r:[["Words like “refurbished” made me doubt the quality",18],["Too much text on screen",10],["Lost interest",6]]},
+    {r:[["The offer repeated without adding anything new",15],["The voice-over felt scripted",12]]},
+    {r:[["The venue and dates were too far from me",13],["Lost interest",9]]},
+    {r:[["The ad felt too long",18]]},
+    {r:[["The ad felt too long",8],["Nothing new to see",6]]},
+    {r:[["The ad felt too long",11]]},
+    {r:[["The ad felt too long",9]]},
+    {r:[["The ad felt too long",7]]}
+  ];
+  var TOTAL=400, STEP=3, LEN=30;
+  function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+  var rand=rng(22102026), exits=[];
+  WINDOWS.forEach(function(w,i){
+    w.n=w.r.reduce(function(s,x){return s+x[1]},0);
+    for(var k=0;k<w.n;k++) exits.push(i*STEP+rand()*STEP);
+  });
+  while(exits.length<TOTAL) exits.push(Infinity);
+  for(var i=exits.length-1;i>0;i--){var j=Math.floor(rand()*(i+1));var x=exits[i];exits[i]=exits[j];exits[j]=x;}
+  function still(t){var c=0;for(var i=0;i<TOTAL;i++) if(exits[i]>t) c++;return c;}
+  function pct(n){return Math.round(n/TOTAL*100)+"%";}
+  function clock(t){var m=Math.floor(t/60),s=Math.floor(t%60);return m+":"+(s<10?"0":"")+s;}
+
+  var $=function(id){return document.getElementById(id)};
+  var seats=$("seats"), dots=[];
+  for(var d=0;d<TOTAL;d++){var el=document.createElement("i");seats.appendChild(el);dots.push(el);}
+
+  var left=WINDOWS.reduce(function(s,w){return s+w.n},0);
+  var by9=WINDOWS[0].n+WINDOWS[1].n+WINDOWS[2].n;
+  $("headline").textContent="Of the "+left+" people who left, "+by9+" did so in the first 9 seconds.";
+  $("kHook").textContent=pct(still(3)); $("kHold").textContent=pct(still(15)); $("kTap").textContent="9%";
+
+  var W=320,H=130,L=30,R=8,T=8,B=22;
+  function X(t){return L+(t/LEN)*(W-L-R)}
+  function Y(v){return T+(1-v/TOTAL)*(H-T-B)}
+  var pts=[];for(var s=0;s<=LEN;s+=STEP) pts.push(X(s)+","+Y(still(s)));
+  var svg='<line class="axis" x1="'+L+'" y1="'+Y(0)+'" x2="'+(W-R)+'" y2="'+Y(0)+'"/>'+
+    '<line class="axis" x1="'+L+'" y1="'+Y(TOTAL)+'" x2="'+L+'" y2="'+Y(0)+'"/>'+
+    '<text class="lab" x="2" y="'+(Y(TOTAL)+4)+'">400</text><text class="lab" x="8" y="'+(Y(0)+4)+'">0</text>'+
+    '<text class="lab" x="'+L+'" y="'+(H-6)+'">0:00</text><text class="lab" x="'+(X(15)-10)+'" y="'+(H-6)+'">0:15</text><text class="lab" x="'+(W-R-26)+'" y="'+(H-6)+'">0:30</text>'+
+    '<polyline class="line" points="'+pts.join(" ")+'"/><line class="mark" id="mark" x1="'+X(0)+'" x2="'+X(0)+'" y1="'+T+'" y2="'+Y(0)+'"/>';
+  $("curve").innerHTML=svg;
+
+  function conf(share){return share>=.4?"Strong agreement":share>=.2?"Medium agreement":"Weak agreement";}
+  function render(t){
+    var n=0;
+    for(var i=0;i<TOTAL;i++){var g=exits[i]<=t;dots[i].className=g?"gone":"";if(!g)n++;}
+    $("clock").textContent=clock(t);
+    $("count").textContent="At "+clock(t)+", "+n+" of "+TOTAL+" are still watching.";
+    var m=document.getElementById("mark");m.setAttribute("x1",X(t));m.setAttribute("x2",X(t));
+    var wi=Math.min(Math.floor(t/STEP),WINDOWS.length-1), w=WINDOWS[wi];
+    $("whyTitle").textContent="Between "+clock(wi*STEP)+" and "+clock(wi*STEP+STEP)+", "+w.n+" people left.";
+    var html="";
+    w.r.forEach(function(r){
+      var share=r[1]/w.n;
+      html+='<li><span class="n">'+r[0]+'</span><span class="tag s">'+conf(share)+'</span><br><span class="small">'+r[1]+" of "+w.n+" ("+Math.round(share*100)+"%) gave this reason. Sample text.</span></li>";
+    });
+    $("why").innerHTML=html;
+  }
+
+  var slider=$("t"), timer=null, play=$("play");
+  slider.addEventListener("input",function(){stop();render(parseFloat(slider.value));});
+  function stop(){if(timer){clearInterval(timer);timer=null;}play.textContent="Play";}
+  play.addEventListener("click",function(){
+    if(timer){stop();return;}
+    if(parseFloat(slider.value)>=LEN) slider.value=0;
+    play.textContent="Pause";
+    timer=setInterval(function(){
+      var v=Math.min(LEN,parseFloat(slider.value)+0.5);slider.value=v;render(v);
+      if(v>=LEN) stop();
+    },350);
+  });
+
+  $("file").addEventListener("change",function(e){
+    var f=e.target.files&&e.target.files[0];
+    $("fileNote").textContent=f?("Chosen: "+f.name+". It stays on your device and isn’t analysed in this prototype."):"No file chosen. A sample ad will be used.";
+  });
+  $("run").addEventListener("click",function(){
+    var run=$("run");run.disabled=true;$("running").style.display="block";
+    setTimeout(function(){
+      $("running").style.display="none";run.disabled=false;
+      $("report").className="on";slider.value=0;render(0);
+      $("report").scrollIntoView({behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+    },900);
+  });
+  render(0);
+})();
+</script>
+</body>
+</html>
