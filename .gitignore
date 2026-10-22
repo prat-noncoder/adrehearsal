@@ -1,0 +1,13 @@
+# Secret keys: never commit these
+api_key.txt
+.env
+.env.*
+
+# Website building blocks (re-created by npm install)
+node_modules/
+
+# Raw NVIDIA data files (too big for GitHub)
+*.parquet
+
+# macOS clutter
+.DS_Store
