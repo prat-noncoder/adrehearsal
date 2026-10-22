@@ -23,6 +23,32 @@ export const FRICTION_TAGS: FrictionTag[] = [
   "too_long",
 ];
 
+/** The 22 ad categories. The same list is used for interest tags and for reading the ad. */
+export const AD_CATEGORIES = [
+  "fashion_apparel",
+  "beauty_personal_care",
+  "food_grocery",
+  "restaurants_delivery",
+  "home_kitchen",
+  "appliances_electronics",
+  "mobiles_gadgets",
+  "vehicles_mobility",
+  "travel_hotels",
+  "finance_insurance",
+  "education_careers",
+  "health_fitness",
+  "real_estate",
+  "entertainment_gaming",
+  "parenting_kids",
+  "jewellery_gold",
+  "weddings_events",
+  "sports_outdoors",
+  "pets",
+  "services_b2b",
+  "telecom_utilities",
+  "farming_agri",
+] as const;
+
 export type MoodName =
   | "baseline"
   | "scroll_fatigue"
@@ -86,6 +112,9 @@ export interface Chunk {
   kind: "hook" | "body" | "cta";
   salience: number;
   friction: Friction[];
+  /** What is on screen, short. Filled in by the ad reader; the engine does not use it. */
+  visual?: string;
+  text?: string;
 }
 
 export interface Timeline {
