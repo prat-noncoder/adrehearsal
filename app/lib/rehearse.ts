@@ -339,21 +339,23 @@ export async function rehearse(req: RehearseRequest, deps: RehearseDeps): Promis
   console.timeEnd("writeReasons");
   const reasonById = new Map(reasons.reasons.map((r) => [r.id, r]));
 
-  const groups: ResponseGroup[] = run.groups.map((g, i) => {
-    const r = i < MAX_GROUPS ? reasonById.get(`g${i}`) : undefined;
-    return {
-      window: windowLabel(g.startS, g.endS),
-      startS: g.startS,
-      endS: g.endS,
-      cause: g.cause,
-      count: g.count,
-      share: g.shareOfWindow,
-      shareOfPanel: g.shareOfPanel,
-      label: g.agreement,
-      reason: r ? r.reason : templateReason(g.cause),
-      reasonSource: r && r.source === "ai" ? "ai" : "template, not AI",
-    };
-  });
+  const groups: ResponseGroup[] = run.groups
+    .filter((g) => g.count >= 3 || g.shareOfWindow >= 0.05)
+    .map((g, i) => {
+      const r = i < MAX_GROUPS ? reasonById.get(`g${i}`) : undefined;
+      return {
+        window: windowLabel(g.startS, g.endS),
+        startS: g.startS,
+        endS: g.endS,
+        cause: g.cause,
+        count: g.count,
+        share: g.shareOfWindow,
+        shareOfPanel: g.shareOfPanel,
+        label: g.agreement,
+        reason: r ? r.reason : templateReason(g.cause),
+        reasonSource: r && r.source === "ai" ? "ai" : "template, not AI",
+      };
+    });
 
   const dots = run.viewers.map((v, k) => {
     const e = run.exits[k];
