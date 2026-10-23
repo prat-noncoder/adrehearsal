@@ -5,7 +5,6 @@ import Report from "../components/Report.tsx";
 import { ACCEPT, prepareAd, UserFacingError } from "../lib/client/prepareAd.ts";
 import type { PreparedAd } from "../lib/client/prepareAd.ts";
 import type { RehearseResponse } from "../lib/rehearse.ts";
-import { copyWarnings } from "../lib/placementChecks.ts";
 import { AGE_MAX, AGE_MIN, ageBandsForRange, sexForGenders } from "../lib/audienceInput.ts";
 
 type Phase = "idle" | "preparing" | "running" | "done" | "error";
@@ -30,9 +29,6 @@ export default function Home() {
   const [tier, setTier] = useState("");
   const [income, setIncome] = useState("");
   const [placement, setPlacement] = useState<"reels" | "feed">("feed");
-  const [headline, setHeadline] = useState("");
-  const [primaryText, setPrimaryText] = useState("");
-  const [ranCopy, setRanCopy] = useState<string[]>([]);
   const [states, setStates] = useState<string[]>([]);
   const [stateQuery, setStateQuery] = useState("");
   const [panelSize, setPanelSize] = useState(400);
@@ -117,7 +113,6 @@ export default function Home() {
       if (!res.ok) {
         throw new UserFacingError(json?.error?.message ?? "The rehearsal could not be completed. Please try again.");
       }
-      setRanCopy(copyWarnings(headline, primaryText));
       setData(json as RehearseResponse);
       setPhase("done");
       setTimeout(() => reportTop.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
@@ -229,15 +224,6 @@ export default function Home() {
                 </select>
               </label>
             </div>
-            <div className="fields">
-              <label className="wide">Headline (optional, checked against Meta's roughly 40-character limit)
-                <input type="text" value={headline} onChange={(e) => setHeadline(e.target.value)} disabled={busy} maxLength={300} />
-              </label>
-              <label className="wide">Primary text (optional, checked against about 125 characters shown before the fold)
-                <textarea value={primaryText} onChange={(e) => setPrimaryText(e.target.value)} disabled={busy} rows={2} maxLength={2000} />
-              </label>
-            </div>
-            {copyWarnings(headline, primaryText).map((w) => <p key={w} className="notice" style={{ marginTop: 12 }}>{w}</p>)}
             {audienceCount !== null && !busy && (
               <p className="help" style={{ marginTop: 16, marginBottom: 0, color: "var(--ink)" }}>
                 We found <strong>{audienceCount.toLocaleString()} people</strong> in our data matching these filters. We'll sample {panelSize} of them for this run.
@@ -264,7 +250,7 @@ export default function Home() {
 
         <div ref={reportTop} />
         {data && phase === "done" && (
-          <Report data={data} copyWarnings={ranCopy} onAgain={() => { setPhase("idle"); setData(null); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
+          <Report data={data} onAgain={() => { setPhase("idle"); setData(null); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
         )}
       </div>
     </>
