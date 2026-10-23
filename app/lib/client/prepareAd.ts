@@ -1,12 +1,21 @@
 // Runs in the browser. Turns the chosen file into the small set of pictures we send to the server.
-// Video: up to 12 frames (one per 3 seconds), 640 px wide, JPEG quality 0.7. Sound is not sent.
+// Video: up to 20 frames (one per 3 seconds, so up to 60 seconds), 640 px wide at first and shrunk
+// step by step if the upload would pass 4.5 MB. Sound is not sent.
 // Image: one picture. Nothing leaves the browser except these pictures.
 
 export const ACCEPT = "image/jpeg,image/png,image/webp,video/mp4,video/quicktime,.mp4,.mov,.jpg,.jpeg,.png,.webp";
 export const MAX_VIDEO_SECONDS = 62; // "about 60 seconds", with a little grace
-const MAX_FRAMES = 12;
+const MAX_FRAMES = 20;
 const FRAME_STEP_S = 3;
-const VIDEO_FRAME_WIDTH = 640;
+// Frame size and JPEG quality to try, biggest first. The first fits most videos; the rest shrink
+// the frames more only if the whole upload would go over the limit.
+const VIDEO_SIZE_STEPS = [
+  { width: 640, quality: 0.7 },
+  { width: 512, quality: 0.6 },
+  { width: 448, quality: 0.5 },
+  { width: 384, quality: 0.45 },
+  { width: 320, quality: 0.4 },
+];
 const IMAGE_MAX_WIDTH = 1024;
 const MAX_PAYLOAD_CHARS = 4.2 * 1024 * 1024; // the server limit is 4.5 MB for the whole request
 
@@ -111,21 +120,30 @@ export async function prepareAd(file: File): Promise<PreparedAd> {
       throw new UserFacingError("This video is longer than about 60 seconds. Please use a shorter one.");
     }
     const count = Math.min(MAX_FRAMES, Math.max(1, Math.ceil(video.duration / FRAME_STEP_S)));
-    const frames: { dataUrl: string }[] = [];
+    // Grab each frame once at the starting size, then encode them, shrinking if the total is too big.
+    const grabbed: HTMLCanvasElement[] = [];
     let allBlank = true;
     for (let k = 0; k < count; k++) {
       const seeked = once(video, "seeked", 10000);
       video.currentTime = Math.min(k * FRAME_STEP_S, Math.max(0, video.duration - 0.05));
       await seeked;
-      const { dataUrl, blank } = drawScaled(video, video.videoWidth, video.videoHeight, VIDEO_FRAME_WIDTH, 0.7);
-      if (!blank) allBlank = false;
-      frames.push({ dataUrl });
+      const scale = Math.min(1, VIDEO_SIZE_STEPS[0].width / video.videoWidth);
+      const c = document.createElement("canvas");
+      c.width = Math.max(1, Math.round(video.videoWidth * scale));
+      c.height = Math.max(1, Math.round(video.videoHeight * scale));
+      c.getContext("2d")?.drawImage(video, 0, 0, c.width, c.height);
+      if (!isNearBlank(c)) allBlank = false;
+      grabbed.push(c);
     }
     if (allBlank) throw new UserFacingError("This video looks blank. Please choose an ad that has something in it.");
-    if (frames.reduce((n, f) => n + f.dataUrl.length, 0) > MAX_PAYLOAD_CHARS) {
-      throw new UserFacingError("This video is too large to send. Please use a shorter or lower-resolution video.");
+
+    for (const step of VIDEO_SIZE_STEPS) {
+      const frames = grabbed.map((c) => ({ dataUrl: drawScaled(c, c.width, c.height, step.width, step.quality).dataUrl }));
+      if (frames.reduce((n, f) => n + f.dataUrl.length, 0) <= MAX_PAYLOAD_CHARS) {
+        return { kind, frames, videoDurationS: video.duration, analysedS: count * FRAME_STEP_S };
+      }
     }
-    return { kind, frames, videoDurationS: video.duration, analysedS: count * FRAME_STEP_S };
+    throw new UserFacingError("This video is too large to send even after shrinking the frames. Please use a shorter video.");
   } finally {
     URL.revokeObjectURL(url);
   }

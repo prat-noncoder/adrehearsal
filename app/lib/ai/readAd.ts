@@ -6,7 +6,7 @@ import type { Chunk, Friction, Timeline } from "../engine/types.ts";
 import { AiError, chat, extractJson } from "./openrouter.ts";
 import type { ChatDeps, ContentPart, Usage } from "./openrouter.ts";
 
-export const MAX_FRAMES = 12; // one frame per 3 seconds, so the first 36 seconds of a video
+export const MAX_FRAMES = 20; // one frame per 3 seconds, so up to 60 seconds of a video
 export const CHUNK_SECONDS = 3;
 export const IMAGE_WINDOW_SECONDS = 6; // ASSUMED: a still image is "watched" for 6 seconds, in 2 chunks
 

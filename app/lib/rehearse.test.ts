@@ -97,8 +97,10 @@ describe("parseRequest", () => {
     expect(() => parseRequest({ ...ok, audience: { sex: "Other" } })).toThrow(RequestError);
     expect(() => parseRequest({ ...ok, audience: { ageBands: ["0-5"] } })).toThrow(RequestError);
     expect(() => parseRequest({ ...ok, seed: 1.5 })).toThrow(RequestError);
-    const thirteen = { kind: "video", frames: Array.from({ length: 13 }, () => ({ dataUrl: jpeg })) };
-    expect(() => parseRequest({ ...ok, ...thirteen })).toThrow(/at most 12/);
+    const tooMany = { kind: "video", frames: Array.from({ length: 21 }, () => ({ dataUrl: jpeg })) };
+    expect(() => parseRequest({ ...ok, ...tooMany })).toThrow(/at most 20/);
+    const maxOk = { kind: "video", frames: Array.from({ length: 20 }, () => ({ dataUrl: jpeg })) };
+    expect(parseRequest({ ...ok, ...maxOk }).frames).toHaveLength(20);
   });
 });
 

@@ -108,7 +108,7 @@ describe("readAd", () => {
     expect(always).toBe(3);
   });
 
-  it("sends one labelled frame per 3 seconds for a video and rejects more than 12", async () => {
+  it("sends one labelled frame per 3 seconds for a video and rejects more than 20", async () => {
     const bodies: any[] = [];
     const fetchImpl = (async (_u: string, init: RequestInit) => {
       bodies.push(JSON.parse(init.body as string));
@@ -134,7 +134,7 @@ describe("readAd", () => {
 
     const tooMany: ReadAdInput = {
       kind: "video",
-      frames: Array.from({ length: 13 }, (_, k) => ({ timeS: k * 3, dataUrl: "data:image/jpeg;base64,AAAA" })),
+      frames: Array.from({ length: 21 }, (_, k) => ({ timeS: k * 3, dataUrl: "data:image/jpeg;base64,AAAA" })),
     };
     await expect(readAd(tooMany, { fetchImpl, sleep: noSleep, apiKey: FAKE_KEY })).rejects.toBeInstanceOf(AiError);
   });
