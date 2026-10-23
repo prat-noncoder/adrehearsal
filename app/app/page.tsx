@@ -41,6 +41,29 @@ export default function Home() {
     return () => clearInterval(id);
   }, [phase]);
 
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/count-audience", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ageBands: age ? [age] : [],
+            sex: sex || undefined,
+            tier: tier ? [tier] : [],
+            incomeGroup: income || undefined,
+            states: state ? [state] : [],
+          }),
+        });
+        const json = await res.json();
+        setAudienceCount(json.matched ?? 0);
+      } catch {
+        setAudienceCount(0);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [age, sex, tier, income, state]);
+
   async function run() {
     if (!file) return;
     setError(null);
@@ -160,6 +183,11 @@ export default function Home() {
                 </select>
               </label>
             </div>
+            {audienceCount !== null && !busy && (
+              <p className="help" style={{ marginTop: 16, marginBottom: 0, color: "var(--ink)" }}>
+                <strong>{audienceCount.toLocaleString()} people match your filters</strong>, using {panelSize} for the panel.
+              </p>
+            )}
             <button className="go" type="button" disabled={!file || busy} onClick={run}>Run the rehearsal</button>
             {phase === "preparing" && <p className="status" role="status">Step 1 of 2: preparing your ad in this browser…</p>}
             {phase === "running" && (
