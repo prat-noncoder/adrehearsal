@@ -127,9 +127,6 @@ export default function Home() {
 
   return (
     <>
-      <div className="banner noprint">
-        <b>Simulated viewers</b> — shows likely problems, not sales predictions.
-      </div>
       <div className="wrap">
         <header>
           <h1>See where people leave your ad, and why, before you spend.</h1>

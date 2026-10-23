@@ -238,6 +238,10 @@ function buildAssumptions(req: RehearseRequest, viewers: Viewer[], timeline: Tim
   const placementLabel = placement === "reels" ? "Instagram Reels" : "Instagram Feed or Facebook Feed";
   const list: Assumption[] = [
     {
+      title: "What this is",
+      detail: "A panel of simulated viewers. This explains likely problems in the ad. It does not predict sales, pick winners or claim accuracy.",
+    },
+    {
       title: "Moods (assumed)",
       detail: `Each viewer gets one mood per run, drawn with a fixed seed. Odds are assumed: ${odds}. Each mood changes patience and price or doubt sensitivity by assumed amounts.`,
     },
