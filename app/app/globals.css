@@ -1,0 +1,109 @@
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --ink:#161a2b; --muted:#5a6075; --line:#d9dce6;
+  --watch:#0f7a85; --gone:#c9ced9; --pick:#e89b00; --pick-ink:#6b4500; --warn-bg:#fff3d6; --warn-ink:#5b3d00;
+  --err-bg:#fde8e8; --err-ink:#7a1313;
+  --radius:10px; color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f131c; --surface:#171c28; --ink:#eceef5; --muted:#9aa1b5; --line:#2b3243;
+    --watch:#3fc1cc; --gone:#2f3648; --pick:#ffb81f; --pick-ink:#ffd98a; --warn-bg:#3a2d0c; --warn-ink:#ffe3a3;
+    --err-bg:#3d1717; --err-ink:#ffc9c9; color-scheme:dark;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque","IBM Plex Sans",system-ui,sans-serif;line-height:1.12;margin:0}
+.wrap{max-width:880px;margin:0 auto;padding:0 20px 56px}
+.banner{background:var(--warn-bg);color:var(--warn-ink);padding:10px 20px;font-size:14px;border-bottom:1px solid var(--line)}
+.banner b{font-weight:600}
+header{padding:44px 0 26px}
+h1{font-size:clamp(30px,6vw,48px);font-weight:700;max-width:16ch;letter-spacing:-.01em}
+.lede{color:var(--muted);max-width:56ch;margin:14px 0 0;font-size:18px}
+section{margin-top:34px}
+h2{font-size:24px;font-weight:700;margin-bottom:6px}
+.help{color:var(--muted);margin:0 0 16px;max-width:62ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+.drop{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+label.pick{display:inline-block;padding:10px 16px;border-radius:8px;border:1.5px dashed var(--muted);cursor:pointer;font-weight:500}
+label.pick:hover,label.pick:focus-within{border-color:var(--watch);color:var(--watch)}
+input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.fileNote{color:var(--muted);font-size:14px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:18px}
+.fields label{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted)}
+select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+button{font:inherit;cursor:pointer}
+button:disabled{opacity:.55;cursor:not-allowed}
+.go{margin-top:20px;background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:12px 22px;font-weight:600}
+.go:hover:not(:disabled){opacity:.9}
+.ghost{background:var(--surface);color:var(--ink);border:1.5px solid var(--ink);border-radius:8px;padding:8px 16px;font-weight:600}
+:focus-visible{outline:3px solid var(--pick);outline-offset:2px}
+.small{font-size:13px;color:var(--muted)}
+.status{margin-top:18px;color:var(--muted)}
+.err{margin-top:18px;background:var(--err-bg);color:var(--err-ink);border-radius:8px;padding:12px 16px}
+.err b{display:block}
+.notice{margin:0 0 14px;background:var(--warn-bg);color:var(--warn-ink);border-radius:8px;padding:10px 14px;font-size:14px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.key{display:flex;flex-wrap:wrap;gap:22px;margin:4px 0 18px}
+.key div{min-width:130px;max-width:190px}
+.key strong{display:block;font:700 34px/1.1 "Bricolage Grotesque",system-ui,sans-serif}
+.key span{font-size:13px;color:var(--muted)}
+.headline{font:700 clamp(21px,3.6vw,28px)/1.2 "Bricolage Grotesque",system-ui,sans-serif;margin:0 0 6px;max-width:34ch}
+.seats{display:grid;gap:5px;margin:6px 0 16px}
+.seats i{aspect-ratio:1;border-radius:50%;background:var(--watch);transition:background .25s,opacity .25s;display:block}
+.seats i.gone{background:var(--gone);opacity:.55}
+.scrub{display:flex;align-items:center;gap:12px}
+.play{background:var(--surface);color:var(--ink);border:1.5px solid var(--ink);border-radius:8px;padding:6px 14px;font-weight:600;min-width:84px}
+input[type=range]{flex:1;accent-color:var(--pick)}
+.clock{font-weight:600;min-width:54px;text-align:right}
+.count{margin:10px 0 0}
+.curve{margin-top:14px}
+svg{width:100%;height:auto;display:block}
+.axis{stroke:var(--line);stroke-width:1}
+.line{fill:none;stroke:var(--watch);stroke-width:2.5}
+.mark{stroke:var(--pick);stroke-width:2}
+.lab{fill:var(--muted);font:11px "IBM Plex Sans",system-ui,sans-serif}
+.win{margin-top:16px}
+.win:first-child{margin-top:0}
+.win h3{font-size:17px;margin-bottom:4px}
+.win.now h3::after{content:"  \2190 slider is here";font:400 12px "IBM Plex Sans",sans-serif;color:var(--pick-ink)}
+.screen{font-size:13px;color:var(--muted);margin:0 0 8px}
+ul.why{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.why li{border-left:4px solid var(--pick);padding:6px 12px;background:var(--bg);border-radius:0 8px 8px 0}
+ul.why .n{font-weight:600}
+.tag{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:99px;padding:1px 9px;margin-left:6px;color:var(--muted)}
+.tag.s{border-color:var(--watch);color:var(--watch)}
+.tag.warn{border-color:var(--pick);color:var(--pick-ink)}
+ul.assumed{margin:0;padding-left:20px}
+ul.assumed li{margin:8px 0}
+.footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);font-weight:500}
+details>summary{cursor:pointer;font-weight:600;padding:2px 0;margin-bottom:12px}
+details>summary:hover{color:var(--watch)}
+details[open]>summary{margin-bottom:12px}
+@media (prefers-reduced-motion:reduce){.seats i{transition:none}}
+@media (max-width:600px){
+  .wrap{padding:0 16px}
+  .fields{grid-template-columns:1fr}
+  .key{gap:14px;flex-direction:column}
+  .key div{min-width:auto;max-width:none}
+  .headline{font-size:20px}
+  h2{font-size:20px}
+  .panel{padding:16px}
+  select{padding:10px}
+  .key strong{font-size:28px}
+  [style*="grid-template-columns: 1fr 1fr"]{grid-template-columns:1fr !important}
+  .seats{gap:3px}
+}
+
+@media print{
+  :root{--bg:#fff;--surface:#fff;--ink:#000;--muted:#333;--line:#bbb;--watch:#0f7a85;--gone:#c9ced9;--pick:#e89b00;--pick-ink:#5b3d00;--warn-bg:#fff;--warn-ink:#000}
+  body{font-size:12px}
+  .noprint,.scrub,.banner.noprint{display:none !important}
+  .wrap{max-width:none;padding:0}
+  section{margin-top:16px}
+  .panel{border:1px solid #bbb;break-inside:avoid}
+  .win{break-inside:avoid}
+  .seats i,.line,.mark{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  a{color:inherit}
+}
