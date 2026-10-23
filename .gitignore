@@ -11,3 +11,6 @@ node_modules/
 
 # macOS clutter
 .DS_Store
+
+# Raw incoming files (labels may contain profile text; never commit)
+incoming/
