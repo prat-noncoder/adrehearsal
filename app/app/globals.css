@@ -16,8 +16,8 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
 h1,h2,h3{font-family:"Bricolage Grotesque","IBM Plex Sans",system-ui,sans-serif;line-height:1.12;margin:0}
 .wrap{max-width:880px;margin:0 auto;padding:0 20px 56px}
-.banner{background:var(--surface);color:var(--muted);padding:12px 20px;font-size:13px;border-bottom:1px solid var(--line)}
-.banner b{font-weight:600}
+.banner{background:transparent;color:var(--muted);padding:0;font-size:12px;border:none;text-align:center;margin:16px 0}
+.banner b{font-weight:500}
 header{padding:44px 0 26px}
 h1{font-size:clamp(30px,6vw,48px);font-weight:700;max-width:16ch;letter-spacing:-.01em}
 .lede{color:var(--muted);max-width:56ch;margin:14px 0 0;font-size:18px}
@@ -47,7 +47,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
 .key{display:flex;flex-wrap:wrap;gap:22px;margin:4px 0 18px}
 .key div{min-width:130px;max-width:190px}
-.key strong{display:block;font:700 34px/1.1 "Bricolage Grotesque",system-ui,sans-serif}
+.key strong{display:block;font:700 42px/1.1 "Bricolage Grotesque",system-ui,sans-serif}
 .key span{font-size:13px;color:var(--muted)}
 .headline{font:700 clamp(21px,3.6vw,28px)/1.2 "Bricolage Grotesque",system-ui,sans-serif;margin:0 0 6px;max-width:34ch}
 .seats{display:grid;gap:5px;margin:6px 0 16px}
@@ -62,7 +62,7 @@ input[type=range]{flex:1;accent-color:var(--pick)}
 svg{width:100%;height:auto;display:block}
 .axis{stroke:var(--line);stroke-width:1}
 .line{fill:none;stroke:var(--watch);stroke-width:2.5}
-.mark{stroke:var(--pick);stroke-width:2}
+.mark{stroke:var(--watch);stroke-width:2}
 .lab{fill:var(--muted);font:11px "IBM Plex Sans",system-ui,sans-serif}
 .win{margin-top:16px}
 .win:first-child{margin-top:0}

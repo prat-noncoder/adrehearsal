@@ -126,7 +126,7 @@ export default function Home() {
   return (
     <>
       <div className="banner noprint">
-        <b>Simulated viewers.</b> A panel of synthetic Indian people reacts to your ad. This explains likely problems. It does not predict sales.
+        <b>Simulated viewers</b> — shows likely problems, not sales predictions.
       </div>
       <div className="wrap">
         <header>

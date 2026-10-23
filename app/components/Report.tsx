@@ -105,23 +105,6 @@ export default function Report({ data, onAgain }: { data: RehearseResponse; onAg
         <div className="curve"><RetentionCurve retention={data.retention} duration={duration} t={t} /></div>
       </div>
 
-      <h2 style={{ marginTop: 28 }}>Who was in the panel</h2>
-      <div className="panel">
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-          <div>
-            <p><b>Age:</b> {data.panelComposition.ageGroups.map((a) => a.count >= 30 ? `${a.label} (${a.count})` : null).filter(Boolean).join(", ") || "(all groups too small)"}</p>
-            <p><b>Gender:</b> {data.panelComposition.genders.map((g) => g.count >= 30 ? `${g.label} (${g.count})` : null).filter(Boolean).join(", ") || "(all groups too small)"}</p>
-            <p><b>City type:</b> {data.panelComposition.tiers.map((t) => t.count >= 30 ? `${t.label} (${t.count})` : null).filter(Boolean).join(", ") || "(all groups too small)"}</p>
-            <p><b>Income group:</b> {data.panelComposition.incomeGroups.map((i) => i.count >= 30 ? `${i.label} (${i.count})` : null).filter(Boolean).join(", ") || "(all groups too small)"}</p>
-          </div>
-          <div>
-            <p><b>Still watching at 3 seconds:</b> {data.panelComposition.watched} of {total}</p>
-            <p><b>Left in the first 3 seconds:</b> {data.panelComposition.leftIn3s} of {total}</p>
-          </div>
-        </div>
-        <p className="small" style={{ marginTop: 12 }}>Groups smaller than 30 people are not shown ("too few people to say").</p>
-      </div>
-
       <h2 style={{ marginTop: 28 }}>Each dot is one simulated viewer</h2>
       {isImage ? (
         <div className="panel">
@@ -164,6 +147,22 @@ export default function Report({ data, onAgain }: { data: RehearseResponse; onAg
           <p className="count">At {clock(t)}, {still} of {total} are still watching.</p>
         </div>
       )}
+
+      <h2 style={{ marginTop: 28 }}>Who was in the panel</h2>
+      <div className="panel">
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+          <div>
+            <p><b>Age:</b> {data.panelComposition.ageGroups.map((a) => a.count >= 30 ? `${a.label} (${a.count})` : null).filter(Boolean).join(", ") || "(all groups too small)"}</p>
+            <p><b>Gender:</b> {data.panelComposition.genders.map((g) => g.count >= 30 ? `${g.label} (${g.count})` : null).filter(Boolean).join(", ") || "(all groups too small)"}</p>
+            <p><b>City type:</b> {data.panelComposition.tiers.map((t) => t.count >= 30 ? `${t.label} (${t.count})` : null).filter(Boolean).join(", ") || "(all groups too small)"}</p>
+            <p><b>Income group:</b> {data.panelComposition.incomeGroups.map((i) => i.count >= 30 ? `${i.label} (${i.count})` : null).filter(Boolean).join(", ") || "(all groups too small)"}</p>
+          </div>
+          <div>
+            <p><b>Still watching at 3 seconds:</b> {data.panelComposition.watched} of {total}</p>
+            <p><b>Left in the first 3 seconds:</b> {data.panelComposition.leftIn3s} of {total}</p>
+          </div>
+        </div>
+      </div>
 
       <h2 style={{ marginTop: 28 }}>Meet four simulated viewers</h2>
       <p className="help">Each is a typical example of their scenario. Simulated profiles, not real people.</p>
