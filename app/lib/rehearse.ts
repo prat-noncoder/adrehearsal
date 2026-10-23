@@ -462,7 +462,7 @@ export async function rehearse(req: RehearseRequest, deps: RehearseDeps): Promis
         gender: v.person.sex,
         cityType: CITY_WORDS[v.person.tier] ?? v.person.tier,
         incomeGroup: INCOME_WORDS[v.person.incomeLevel],
-        reason: "watched to the end",
+        reason: "Stayed engaged throughout the ad",
       });
       break;
     }

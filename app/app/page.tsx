@@ -149,7 +149,7 @@ export default function Home() {
             <div className="fields">
               <label>Where will it run? (assumed, not India-specific)
                 <select value={placement} onChange={(e) => setPlacement(e.target.value as "reels" | "feed")} disabled={busy}>
-                  <option value="feed">Instagram Feed or Facebook Feed (23% hook target)</option><option value="reels">Instagram Reels (30% hook target)</option>
+                  <option value="feed">Instagram Feed or Facebook Feed</option><option value="reels">Instagram Reels</option>
                 </select>
               </label>
               <label>State
@@ -185,7 +185,7 @@ export default function Home() {
             </div>
             {audienceCount !== null && !busy && (
               <p className="help" style={{ marginTop: 16, marginBottom: 0, color: "var(--ink)" }}>
-                <strong>{audienceCount.toLocaleString()} people match your filters</strong>, using {panelSize} for the panel.
+                We found <strong>{audienceCount.toLocaleString()} people</strong> in our data matching these filters. We'll sample {panelSize} of them for this run.
               </p>
             )}
             <button className="go" type="button" disabled={!file || busy} onClick={run}>Run the rehearsal</button>
