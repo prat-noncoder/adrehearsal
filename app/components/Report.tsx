@@ -20,6 +20,21 @@ const CAUSE_LABEL: Record<string, string> = {
 const AGREEMENT_LABEL = { strong: "Strong agreement", medium: "Medium agreement", weak: "Weak agreement" } as const;
 
 const pct = (x: number) => `${Math.round(x * 100)}%`;
+
+function CountUp({ value }: { value: number }) {
+  const [v, setV] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { setV(value); return; }
+    const t0 = Date.now();
+    const id = setInterval(() => {
+      const p = Math.min(1, (Date.now() - t0) / 800);
+      setV(value * (1 - Math.pow(1 - p, 3)));
+      if (p >= 1) clearInterval(id);
+    }, 20);
+    return () => clearInterval(id);
+  }, [value]);
+  return <>{pct(v)}</>;
+}
 const clock = (t: number) => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
 
 function RetentionCurve({ retention, duration, t }: { retention: number[]; duration: number; t: number }) {
@@ -136,13 +151,13 @@ export default function Report({ data, onAgain, copyWarnings = [] }: { data: Reh
 
       <div className="panel" style={{ marginTop: 14 }}>
         <div className="key">
-          <div><strong>{pct(data.funnel.hook)}</strong><span>still watching at 3 seconds (the hook)</span></div>
+          <div><strong><CountUp value={data.funnel.hook} /></strong><span>still watching at 3 seconds (the hook)</span></div>
           {showHold && (
-            <div><strong>{pct(data.funnel.hold)}</strong><span>still watching at {midS} seconds (the hold, midpoint)</span></div>
+            <div><strong><CountUp value={data.funnel.hold} /></strong><span>still watching at {midS} seconds (the hold, midpoint)</span></div>
           )}
-          <div><strong>{pct(data.funnel.end)}</strong><span>watched to the end, {duration} seconds</span></div>
+          <div><strong><CountUp value={data.funnel.end} /></strong><span>watched to the end, {duration} seconds</span></div>
           <div>
-            <strong>{pct(data.funnel.tap)}</strong>
+            <strong><CountUp value={data.funnel.tap} /></strong>
             <span>would tap to learn more (stated intent, assumed; {data.funnel.tapEligible} watched enough to tap)</span>
           </div>
         </div>

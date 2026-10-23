@@ -217,3 +217,11 @@ body[data-view="form"] .drop{padding:22px;border:2px solid transparent;border-ra
 @keyframes phrase{0%{opacity:0;transform:translateY(6px)}15%,80%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-6px)}}
 body[data-view="form"]{--watch:#5b616c}
 @media (prefers-reduced-motion:reduce){.drift,.phrase{animation:none}}
+
+/* Report view: the one big shift, from the dark form to warm cream */
+body[data-view="report"]{--bg:#FAF6EE}
+#report{animation:reportIn .8s ease both}
+@keyframes reportIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.decision p{font-size:clamp(40px,7vw,64px);font-weight:800;letter-spacing:-.045em;line-height:1.02;max-width:none;margin-top:10px}
+.decision{padding:24px 26px}
+@media (prefers-reduced-motion:reduce){#report{animation:none}}
