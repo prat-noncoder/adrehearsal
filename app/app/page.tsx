@@ -153,13 +153,13 @@ export default function Home() {
               <span className="fileNote">{file ? `Chosen: ${file.name}` : "No file chosen."}</span>
             </div>
             <div className="fields">
-              <label>Where will it run? (assumed, not India-specific)
+              <label>Where will it run?
                 <select value={placement} onChange={(e) => setPlacement(e.target.value as "reels" | "feed")} disabled={busy}>
                   <option value="feed">Instagram Feed or Facebook Feed</option><option value="reels">Instagram Reels</option>
                 </select>
               </label>
               <div className="field wide">
-                <span>State (search and pick any number)</span>
+                <span>State</span>
                 <div className="chips">
                   {states.map((st) => (
                     <button key={st} type="button" className="chip on" disabled={busy}
@@ -214,7 +214,7 @@ export default function Home() {
                   <option value="">Any</option><option value="metro">Metro</option><option value="urban_other">Other city or town</option><option value="rural">Rural</option>
                 </select>
               </label>
-              <label>Income group (assumed)
+              <label>Income group
                 <select value={income} onChange={(e) => setIncome(e.target.value)} disabled={busy}>
                   <option value="">Any</option><option value="lower">Lower</option><option value="middle">Middle</option><option value="upper">Upper</option>
                 </select>
