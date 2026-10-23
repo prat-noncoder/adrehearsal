@@ -3,7 +3,7 @@ import { getBank, getBase0 } from "../../../lib/bankData.ts";
 import { parseRequest, rehearse, RequestError } from "../../../lib/rehearse.ts";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 // A normal Vercel function request is capped at 4.5 MB. Stay a little under it.
 const MAX_BYTES = 4.4 * 1024 * 1024;

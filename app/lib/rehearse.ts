@@ -249,7 +249,9 @@ export async function rehearse(req: RehearseRequest, deps: RehearseDeps): Promis
   const readAd = deps.readAd ?? defaultReadAd;
   const writeReasons = deps.writeReasons ?? defaultWriteReasons;
 
+  console.time("readAd");
   const ad = await readAd({ kind: req.kind, frames: req.frames });
+  console.timeEnd("readAd");
   const timeline = ad.timeline;
 
   const filter: AudienceFilter = {
@@ -258,6 +260,7 @@ export async function rehearse(req: RehearseRequest, deps: RehearseDeps): Promis
     tiers: req.audience.tier,
     incomeLevels: req.audience.incomeGroup ? C.INCOME_GROUPS[req.audience.incomeGroup] : undefined,
   };
+  console.time("panel selection and engine");
   const run = runRehearsal({
     bank: deps.bank,
     timeline,
@@ -266,14 +269,24 @@ export async function rehearse(req: RehearseRequest, deps: RehearseDeps): Promis
     seed: req.seed,
     base0: deps.base0,
   });
+  console.timeEnd("panel selection and engine");
   if (run.viewers.length === 0) throw new RequestError("No one in the bank matches this audience. Try widening the filters.");
+
+  // Cache cause of exit for each viewer to avoid recomputing it.
+  console.time("build exit cause cache");
+  const exitCauses = run.viewers.map((v, k) => {
+    const e = run.exits[k];
+    return e !== null ? causeOfExit(timeline.chunks[e], v) : null;
+  });
+  console.timeEnd("build exit cause cache");
 
   // Who left in each group, and what was on screen, for the reasons call.
   const topGroups = run.groups.slice(0, MAX_GROUPS);
+  console.time("reasons input building");
   const inputs: GroupInput[] = topGroups.map((g, i) => {
     const chunk = timeline.chunks[g.chunkIndex];
     const leavers = run.viewers.filter(
-      (v, k) => run.exits[k] === g.chunkIndex && causeOfExit(chunk, v) === g.cause,
+      (v, k) => run.exits[k] === g.chunkIndex && exitCauses[k] === g.cause,
     );
     return {
       id: `g${i}`,
@@ -289,7 +302,10 @@ export async function rehearse(req: RehearseRequest, deps: RehearseDeps): Promis
       onScreen: { visual: chunk.visual ?? "", text: chunk.text ?? "" },
     };
   });
+  console.timeEnd("reasons input building");
+  console.time("writeReasons");
   const reasons = await writeReasons(inputs);
+  console.timeEnd("writeReasons");
   const reasonById = new Map(reasons.reasons.map((r) => [r.id, r]));
 
   const groups: ResponseGroup[] = run.groups.map((g, i) => {
