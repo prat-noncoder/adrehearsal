@@ -115,3 +115,9 @@ details[open]>summary{margin-bottom:12px}
 .todo p{margin:8px 0}
 .tagk{display:inline-block;min-width:52px;font-size:12px;letter-spacing:.06em;color:var(--muted)}
 .tagk.accent{color:var(--accent)}
+.splitHead{font-size:16px;margin-bottom:4px}
+.splits{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:10px}
+.splitRow{display:flex;justify-content:space-between;margin:6px 0;border-bottom:1px solid var(--line);padding-bottom:4px}
+.splitRow em{font-style:normal;color:var(--muted);margin-left:8px;font-size:13px}
+.splitRow em.up{color:var(--accent);font-weight:600}
+@media (max-width:600px){.splits{grid-template-columns:1fr}}

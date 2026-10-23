@@ -79,6 +79,7 @@ export default function Report({ data, onAgain }: { data: RehearseResponse; onAg
   }, [data.groups]);
 
   const todo = doThisNow(data);
+  const overall = data.panelComposition.watched / (total || 1);
   const cost = data.costInfo.totalCostUsd;
   const tokens = [data.costInfo.readAd, data.costInfo.reasons].reduce(
     (n, p) => n + (p ? p.promptTokens + p.completionTokens : 0),
@@ -173,6 +174,27 @@ export default function Report({ data, onAgain }: { data: RehearseResponse; onAg
             <p><b>Still watching at 3 seconds:</b> {data.panelComposition.watched} of {total}</p>
             <p><b>Left in the first 3 seconds:</b> {data.panelComposition.leftIn3s} of {total}</p>
           </div>
+        </div>
+      </div>
+
+      <div className="panel" style={{ marginTop: 14 }}>
+        <h3 className="splitHead">Who stayed past the hook, by group</h3>
+        <p className="small">Compared with everyone in the panel ({pct(data.funnel.hook)}). pt = percentage points. Groups under 30 people are hidden.</p>
+        <div className="splits">
+          {[["Age", data.panelComposition.hookByAge], ["Gender", data.panelComposition.hookByGender]].map(([title, rows]) => (
+            <div key={title as string}>
+              <b>{title as string}</b>
+              {(rows as { label: string; count: number; hook: number }[]).filter((r) => r.count >= 30).map((r) => {
+                const d = Math.round((r.hook - overall) * 100);
+                return (
+                  <p key={r.label} className="splitRow">
+                    <span>{r.label === "Male" ? "Men" : r.label === "Female" ? "Women" : r.label}</span>
+                    <span>{pct(r.hook)} <em className={d === 0 ? "" : d > 0 ? "up" : "down"}>{d > 0 ? "+" : d < 0 ? "\u2212" : ""}{Math.abs(d)}pt</em></span>
+                  </p>
+                );
+              })}
+            </div>
+          ))}
         </div>
       </div>
 

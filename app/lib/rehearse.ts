@@ -143,6 +143,9 @@ export interface PanelComposition {
   incomeGroups: Array<{ label: string; count: number }>;
   leftIn3s: number;
   watched: number;
+  /** Share of each group still watching at second 3, for the segment splits. */
+  hookByAge: Array<{ label: string; count: number; hook: number }>;
+  hookByGender: Array<{ label: string; count: number; hook: number }>;
 }
 
 export interface ViewerProfile {
@@ -408,7 +411,19 @@ export async function rehearse(req: RehearseRequest, deps: RehearseDeps): Promis
     const k = run.viewers.indexOf(v);
     if (run.exits[k] === 0) leftIn3s++; // Exited in first chunk (0-3 seconds)
   }
+  const hookBy = (key: (v: (typeof run.viewers)[number]) => string) => {
+    const m = new Map<string, { count: number; stayed: number }>();
+    run.viewers.forEach((v, k) => {
+      const e = m.get(key(v)) ?? { count: 0, stayed: 0 };
+      e.count++;
+      if (run.exits[k] !== 0) e.stayed++;
+      m.set(key(v), e);
+    });
+    return Array.from(m).map(([label, e]) => ({ label, count: e.count, hook: e.stayed / e.count })).sort((a, b) => a.label.localeCompare(b.label));
+  };
   const panelComposition: PanelComposition = {
+    hookByAge: hookBy((v) => v.person.ageband),
+    hookByGender: hookBy((v) => v.person.sex),
     ageGroups: Array.from(ageMap).map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count),
     genders: Array.from(genderMap).map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count),
     tiers: Array.from(tierMap).map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count),
