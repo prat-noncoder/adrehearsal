@@ -233,10 +233,10 @@ export default function Home() {
               <p className="notice" style={{ marginTop: 16 }}>Larger runs take longer and cost more. Pick a smaller size for a quick demo.</p>
             )}
             <button className="go" type="button" disabled={!file || busy} onClick={run}>Run the rehearsal</button>
-            {phase === "preparing" && <p className="status" role="status">Step 1 of 2: preparing your ad in this browser…</p>}
+            {phase === "preparing" && <p className="status" role="status"><span className="pulse" aria-hidden="true" />Step 1 of 2: preparing your ad in this browser…</p>}
             {phase === "running" && (
               <p className="status" role="status">
-                Step 2 of 2: reading the ad, simulating {panelSize} viewers and writing the reasons. This usually takes 10 to 40 seconds ({elapsed}s so far).
+                <span className="pulse" aria-hidden="true" />Step 2 of 2: reading the ad, simulating {panelSize} viewers and writing the reasons. This usually takes 10 to 40 seconds ({elapsed}s so far).
               </p>
             )}
             {error && (
