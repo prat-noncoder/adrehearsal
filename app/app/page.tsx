@@ -39,6 +39,10 @@ export default function Home() {
   const [audienceCount, setAudienceCount] = useState<number | null>(null);
   const [bankStats, setBankStats] = useState<{ total: number; excluded: number } | null>(null);
   const reportTop = useRef<HTMLDivElement>(null);
+  const reportShown = !!data && phase === "done";
+  useEffect(() => {
+    document.body.dataset.view = reportShown ? "report" : "form";
+  }, [reportShown]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   useEffect(() => {
     if (!file) { setPreviewUrl(null); return; }
@@ -145,6 +149,7 @@ export default function Home() {
   return (
     <>
       <div className="wrap">
+        {!reportShown && (<>
         <header>
           <h1>See where people leave your ad, and why, before you spend.</h1>
           <p className="lede">Upload an ad, say who it&rsquo;s for, and watch a panel of simulated Indian viewers react to it, second by second.</p>
@@ -295,6 +300,7 @@ export default function Home() {
           </div>
         </section>
 
+        </>)}
         <div ref={reportTop} />
         {data && phase === "done" && (
           <Report data={data} onAgain={() => { setPhase("idle"); setData(null); window.scrollTo({ top: 0, behavior: "smooth" }); }} />

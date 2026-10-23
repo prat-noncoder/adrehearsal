@@ -161,3 +161,48 @@ select:focus:hover,input[type=text]:focus:hover:not(:disabled),.chip:focus-visib
   .layout.hasPreview{display:grid;grid-template-columns:260px 1fr;gap:32px;align-items:start}
   .layout.hasPreview .preview{position:sticky;top:24px;margin-bottom:0}
 }
+
+/* Dark, bold input page (applies only while the form is showing) */
+body{transition:background-color .6s ease,color .6s ease}
+body[data-view="form"]{
+  --bg:#0B0C0E; --surface:#14161A; --field:#1B1E24; --ink:#fff; --muted:#A3A9B4; --line:#2C3038;
+  --accent:#FF6B4A; --shadow:0 1px 2px rgba(0,0,0,.5),0 4px 14px rgba(0,0,0,.35);
+  --hover-shadow:0 2px 10px rgba(0,0,0,.6);
+  color-scheme:dark;
+}
+body[data-view="form"] h1{font-size:clamp(44px,7.5vw,64px);font-weight:800;letter-spacing:-.045em;line-height:1.02;max-width:15ch}
+body[data-view="form"] .lede{color:var(--muted)}
+body[data-view="form"] .card h2{display:inline-block;font-size:24px;font-weight:800;letter-spacing:-.02em;padding-bottom:6px;border-bottom:3px solid var(--accent);margin-bottom:12px}
+body[data-view="form"] .panel{background:var(--surface);border-color:var(--line);box-shadow:var(--shadow)}
+body[data-view="form"] select,
+body[data-view="form"] input[type=text],
+body[data-view="form"] .chip{background:var(--field);color:var(--ink);border:1px solid var(--line);border-radius:8px}
+body[data-view="form"] select:hover,
+body[data-view="form"] input[type=text]:hover:not(:disabled),
+body[data-view="form"] .chip:hover:not(:disabled){box-shadow:var(--hover-shadow)}
+body[data-view="form"] select:focus,
+body[data-view="form"] input[type=text]:focus,
+body[data-view="form"] .chip:focus-visible,
+body[data-view="form"] select:focus:hover,
+body[data-view="form"] input[type=text]:focus:hover:not(:disabled){outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,107,74,.35)}
+body[data-view="form"] .chip.on{background:rgba(255,107,74,.16);border-color:var(--accent);color:#fff}
+body[data-view="form"] :focus-visible{outline-color:var(--accent)}
+body[data-view="form"] .suggest{background:var(--field);border-color:var(--line);box-shadow:0 8px 24px rgba(0,0,0,.6)}
+body[data-view="form"] .suggest li button{color:var(--ink)}
+body[data-view="form"] .suggest li button:hover,body[data-view="form"] .suggest li button:focus-visible{background:rgba(255,255,255,.08)}
+body[data-view="form"] label.pick{border-color:var(--muted);color:var(--ink);background:transparent}
+body[data-view="form"] label.pick:hover,body[data-view="form"] label.pick:focus-within{border-color:var(--accent);color:var(--accent)}
+body[data-view="form"] .go{background:var(--accent);color:#0B0C0E;font-weight:700}
+body[data-view="form"] .go:hover:not(:disabled){background:#E85A3A;box-shadow:0 3px 14px rgba(255,107,74,.35)}
+body[data-view="form"] .go:active:not(:disabled){background:#CF4E31;box-shadow:none}
+body[data-view="form"] .notice{background:var(--field);border-color:var(--line);color:var(--ink)}
+body[data-view="form"] .err{background:var(--field);border-color:var(--accent);color:var(--ink)}
+body[data-view="form"] .preview img,body[data-view="form"] .preview video{background:var(--field);border-color:var(--line)}
+body[data-view="form"] .pulse{background:var(--accent)}
+/* Slowly turning gradient border around the upload box */
+@property --ang{syntax:"<angle>";initial-value:0deg;inherits:false}
+@keyframes turn{to{--ang:360deg}}
+body[data-view="form"] .drop{padding:22px;border:2px solid transparent;border-radius:12px;
+  background:linear-gradient(var(--field),var(--field)) padding-box,conic-gradient(from var(--ang),#FF6B4A,rgba(255,107,74,.08) 35%,rgba(255,107,74,.08) 60%,#FF6B4A) border-box;
+  animation:turn 9s linear infinite}
+@media (prefers-reduced-motion:reduce){body[data-view="form"] .drop{animation:none}}
