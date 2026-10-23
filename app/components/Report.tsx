@@ -200,20 +200,21 @@ export default function Report({ data, onAgain }: { data: RehearseResponse; onAg
 
       <h2 style={{ marginTop: 28 }}>Meet four simulated viewers</h2>
       <p className="help">Each is a typical example of their scenario. Simulated profiles, not real people.</p>
-      <div className="panel" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
+      <div className="quotes">
         {data.viewers.map((v) => (
-          <div key={v.scenario} style={{ padding: 12, border: "1px solid var(--line)", borderRadius: 8 }}>
-            <h4 style={{ margin: "0 0 8px", fontSize: 14, fontWeight: 600 }}>
-              {v.scenario === "left-in-3s" && "Left in first 3 seconds"}
-              {v.scenario === "left-later" && "Left later"}
-              {v.scenario === "watched-end" && "Watched to the end"}
-              {v.scenario === "would-tap" && "Would tap"}
-            </h4>
-            <p style={{ margin: 0, fontSize: 13, lineHeight: 1.6 }}>
-              <b>{v.ageBand}</b>, {v.gender}, {v.cityType}, {v.incomeGroup}<br />
-              <span style={{ color: "var(--muted)", fontSize: 12 }}>"{v.reason}"</span>
-            </p>
-          </div>
+          <figure key={v.scenario} className="quote">
+            <blockquote>&ldquo;{v.reason}&rdquo;</blockquote>
+            <figcaption>
+              <span className="badge">{v.ageBand}, {v.gender}, {v.cityType}, {v.incomeGroup}</span>
+              <span className="stopped">
+                Stopped at:{" "}
+                {v.scenario === "left-in-3s" && "the first 3 seconds (the hook)"}
+                {v.scenario === "left-later" && "after the first 3 seconds"}
+                {v.scenario === "watched-end" && "did not stop, watched to the end"}
+                {v.scenario === "would-tap" && "did not stop, would tap to learn more"}
+              </span>
+            </figcaption>
+          </figure>
         ))}
       </div>
 

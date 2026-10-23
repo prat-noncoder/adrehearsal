@@ -121,3 +121,9 @@ details[open]>summary{margin-bottom:12px}
 .splitRow em{font-style:normal;color:var(--muted);margin-left:8px;font-size:13px}
 .splitRow em.up{color:var(--accent);font-weight:600}
 @media (max-width:600px){.splits{grid-template-columns:1fr}}
+.quotes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.quote{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;display:flex;flex-direction:column;justify-content:space-between;gap:14px}
+.quote blockquote{margin:0;font-size:17px;line-height:1.4;font-weight:500}
+.quote figcaption{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
+.badge{display:inline-block;align-self:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:2px 10px;color:var(--ink)}
+.stopped{font-weight:600}
