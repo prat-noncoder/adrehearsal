@@ -5,6 +5,7 @@ import Report from "../components/Report.tsx";
 import { ACCEPT, prepareAd, UserFacingError } from "../lib/client/prepareAd.ts";
 import type { PreparedAd } from "../lib/client/prepareAd.ts";
 import type { RehearseResponse } from "../lib/rehearse.ts";
+import { AGE_MAX, AGE_MIN, ageBandsForRange, sexForGenders } from "../lib/audienceInput.ts";
 
 type Phase = "idle" | "preparing" | "running" | "done" | "error";
 
@@ -20,12 +21,14 @@ const STATES = [
 
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
-  const [age, setAge] = useState("");
-  const [sex, setSex] = useState("");
+  const [ageMin, setAgeMin] = useState(AGE_MIN);
+  const [ageMax, setAgeMax] = useState(AGE_MAX);
+  const [genders, setGenders] = useState<string[]>(["Male", "Female"]);
   const [tier, setTier] = useState("");
   const [income, setIncome] = useState("");
   const [placement, setPlacement] = useState<"reels" | "feed">("feed");
-  const [state, setState] = useState("");
+  const [states, setStates] = useState<string[]>([]);
+  const [stateQuery, setStateQuery] = useState("");
   const [panelSize, setPanelSize] = useState(400);
   const [phase, setPhase] = useState<Phase>("idle");
   const [elapsed, setElapsed] = useState(0);
@@ -48,11 +51,10 @@ export default function Home() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            ageBands: age ? [age] : [],
-            sex: sex || undefined,
+            ageMin, ageMax, genders,
             tier: tier ? [tier] : [],
             incomeGroup: income || undefined,
-            states: state ? [state] : [],
+            states,
           }),
         });
         const json = await res.json();
@@ -62,7 +64,7 @@ export default function Home() {
       }
     }, 300);
     return () => clearTimeout(timer);
-  }, [age, sex, tier, income, state]);
+  }, [ageMin, ageMax, genders, tier, income, states]);
 
   async function run() {
     if (!file) return;
@@ -91,11 +93,11 @@ export default function Home() {
           frames: prepared.frames,
           videoDurationS: prepared.videoDurationS,
           audience: {
-            ageBands: age ? [age] : [],
-            sex: sex || undefined,
+            ageBands: ageBandsForRange(ageMin, ageMax),
+            sex: sexForGenders(genders),
             tier: tier ? [tier] : [],
             incomeGroup: income || undefined,
-            states: state ? [state] : [],
+            states,
           },
           panelSize,
           placement,
@@ -152,21 +154,47 @@ export default function Home() {
                   <option value="feed">Instagram Feed or Facebook Feed</option><option value="reels">Instagram Reels</option>
                 </select>
               </label>
-              <label>State
-                <select value={state} onChange={(e) => setState(e.target.value)} disabled={busy}>
-                  <option value="">All India</option>{STATES.map((s) => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </label>
-              <label>Age
-                <select value={age} onChange={(e) => setAge(e.target.value)} disabled={busy}>
-                  <option value="">Any</option><option>18-24</option><option>25-34</option><option>35-44</option><option>45-59</option><option>60+</option>
-                </select>
-              </label>
-              <label>Gender
-                <select value={sex} onChange={(e) => setSex(e.target.value)} disabled={busy}>
-                  <option value="">Any</option><option value="Female">Women</option><option value="Male">Men</option>
-                </select>
-              </label>
+              <div className="field wide">
+                <span>State (search and pick any number)</span>
+                <div className="chips">
+                  {states.map((st) => (
+                    <button key={st} type="button" className="chip on" disabled={busy}
+                      onClick={() => setStates(states.filter((x) => x !== st))}>{st} ×</button>
+                  ))}
+                  {states.length === 0 && <span className="small">All India</span>}
+                </div>
+                <input type="text" value={stateQuery} placeholder="Type to search states" disabled={busy}
+                  onChange={(e) => setStateQuery(e.target.value)} aria-label="Search states" />
+                {stateQuery && (
+                  <div className="chips">
+                    {STATES.filter((st) => !states.includes(st) && st.toLowerCase().includes(stateQuery.toLowerCase())).map((st) => (
+                      <button key={st} type="button" className="chip" disabled={busy}
+                        onClick={() => { setStates([...states, st]); setStateQuery(""); }}>+ {st}</button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="field wide">
+                <span>Age: {ageMin} to {ageMax >= AGE_MAX ? `${AGE_MAX}+` : ageMax}</span>
+                <div className="dual">
+                  <input type="range" min={AGE_MIN} max={AGE_MAX} value={ageMin} disabled={busy} aria-label="Youngest age"
+                    onChange={(e) => setAgeMin(Math.min(Number(e.target.value), ageMax))} />
+                  <input type="range" min={AGE_MIN} max={AGE_MAX} value={ageMax} disabled={busy} aria-label="Oldest age"
+                    onChange={(e) => setAgeMax(Math.max(Number(e.target.value), ageMin))} />
+                </div>
+              </div>
+              <div className="field">
+                <span>Gender</span>
+                <div className="chips">
+                  {[["Male", "Men"], ["Female", "Women"]].map(([v, l]) => {
+                    const on = genders.includes(v);
+                    return (
+                      <button key={v} type="button" className={`chip${on ? " on" : ""}`} disabled={busy} aria-pressed={on}
+                        onClick={() => setGenders(on ? (genders.length > 1 ? genders.filter((x) => x !== v) : genders) : [...genders, v])}>{l}</button>
+                    );
+                  })}
+                </div>
+              </div>
               <label>City type
                 <select value={tier} onChange={(e) => setTier(e.target.value)} disabled={busy}>
                   <option value="">Any</option><option value="metro">Metro</option><option value="urban_other">Other city or town</option><option value="rural">Rural</option>
