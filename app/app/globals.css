@@ -148,3 +148,16 @@ select:focus,input[type=text]:focus,.chip:focus-visible{outline:none;border-colo
 @keyframes pulse{0%,100%{transform:scale(.7);opacity:.45}50%{transform:scale(1.1);opacity:1}}
 @media (prefers-reduced-motion:reduce){.pulse{animation:none}}
 select:focus:hover,input[type=text]:focus:hover:not(:disabled),.chip:focus-visible:hover{box-shadow:0 0 0 3px rgba(47,93,79,.25)}
+
+/* Grouped form cards + preview */
+.layout{display:block}
+.cards{display:grid;gap:24px}
+.card h2{font-size:20px;margin-bottom:6px}
+.card .fields{margin-top:16px}
+.preview{margin-bottom:24px;display:flex;flex-direction:column;gap:8px}
+.preview img,.preview video{width:100%;max-height:360px;object-fit:contain;border:1px solid var(--line);border-radius:12px;background:#fff}
+.pill{border-radius:99px;padding:8px 16px;font-size:14px}
+@media (min-width:900px){
+  .layout.hasPreview{display:grid;grid-template-columns:260px 1fr;gap:32px;align-items:start}
+  .layout.hasPreview .preview{position:sticky;top:24px;margin-bottom:0}
+}

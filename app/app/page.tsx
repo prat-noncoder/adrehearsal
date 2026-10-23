@@ -39,6 +39,13 @@ export default function Home() {
   const [audienceCount, setAudienceCount] = useState<number | null>(null);
   const [bankStats, setBankStats] = useState<{ total: number; excluded: number } | null>(null);
   const reportTop = useRef<HTMLDivElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!file) { setPreviewUrl(null); return; }
+    const u = URL.createObjectURL(file);
+    setPreviewUrl(u);
+    return () => URL.revokeObjectURL(u);
+  }, [file]);
 
   useEffect(() => {
     if (phase !== "running") return;
@@ -144,23 +151,45 @@ export default function Home() {
         </header>
 
         <section className="noprint" id="setup">
-          <h2>Set up the rehearsal</h2>
-          <p className="help">
-            Choose an image (JPEG, PNG, WebP) or a video up to about 60 seconds (MP4 or MOV). Only still frames are sent for reading. Sound is not analysed.
-          </p>
-          <div className="panel">
-            <div className="drop">
-              <label className="pick" htmlFor="file">Choose an ad (video or image)</label>
-              <input id="file" type="file" accept={ACCEPT} disabled={busy}
-                onChange={(e) => { setFile(e.target.files?.[0] ?? null); setError(null); setPhase("idle"); }} />
-              <span className="fileNote">{file ? `Chosen: ${file.name}` : "No file chosen."}</span>
-            </div>
-            <div className="fields">
-              <label>Where will it run?
-                <select value={placement} onChange={(e) => setPlacement(e.target.value as "reels" | "feed")} disabled={busy}>
-                  <option value="feed">Instagram Feed or Facebook Feed</option><option value="reels">Instagram Reels</option>
-                </select>
-              </label>
+          <div className={`layout${previewUrl ? " hasPreview" : ""}`}>
+            {previewUrl && file && (
+              <aside className="preview" aria-label="Preview of your ad">
+                {file.type.startsWith("video/") ? (
+                  <video src={previewUrl} muted controls playsInline />
+                ) : (
+                  <img src={previewUrl} alt="Your ad" />
+                )}
+                <span className="small">{file.name}</span>
+              </aside>
+            )}
+            <div className="cards">
+              <div className="panel card">
+                <h2>The Ad</h2>
+                <p className="help">
+                  Choose an image (JPEG, PNG, WebP) or a video up to about 60 seconds (MP4 or MOV). Only still frames are sent for reading. Sound is not analysed.
+                </p>
+                <div className="drop">
+                  <label className="pick" htmlFor="file">Choose an ad (video or image)</label>
+                  <input id="file" type="file" accept={ACCEPT} disabled={busy}
+                    onChange={(e) => { setFile(e.target.files?.[0] ?? null); setError(null); setPhase("idle"); }} />
+                  <span className="fileNote">{file ? `Chosen: ${file.name}` : "No file chosen."}</span>
+                </div>
+              </div>
+
+              <div className="panel card">
+                <h2>Placement</h2>
+                <p className="help">Where will it run?</p>
+                <div className="chips" role="group" aria-label="Placement">
+                  {([["feed", "Instagram Feed or Facebook Feed"], ["reels", "Instagram Reels"]] as const).map(([v, l]) => (
+                    <button key={v} type="button" className={`chip pill${placement === v ? " on" : ""}`} aria-pressed={placement === v} disabled={busy}
+                      onClick={() => setPlacement(v)}>{l}</button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="panel card">
+                <h2>Who It&rsquo;s For</h2>
+                <div className="fields">
               <div className="field wide">
                 <span>State</span>
                 <div className="chips">
@@ -222,6 +251,12 @@ export default function Home() {
                   <option value="">Any</option><option value="lower">Lower</option><option value="middle">Middle</option><option value="upper">Upper</option>
                 </select>
               </label>
+                </div>
+              </div>
+
+              <div className="panel card">
+                <h2>Panel Size</h2>
+                <div className="fields">
               <label>Panel size
                 <select value={panelSize} onChange={(e) => setPanelSize(Number(e.target.value))} disabled={busy}>
                   <option value={200}>200 (~6s)</option>
@@ -231,7 +266,7 @@ export default function Home() {
                   <option value={20000}>All matching (up to 20,000) (~10 min)</option>
                 </select>
               </label>
-            </div>
+                </div>
             {audienceCount !== null && !busy && (
               <p className="help" style={{ marginTop: 16, marginBottom: 0, color: "var(--ink)" }}>
                 <strong>{audienceCount.toLocaleString()}</strong>{bankStats ? ` of ${bankStats.total.toLocaleString()}` : ""} people in our data match these filters
@@ -255,6 +290,8 @@ export default function Home() {
                 {error.message}
               </div>
             )}
+              </div>
+            </div>
           </div>
         </section>
 
