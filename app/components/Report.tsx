@@ -42,7 +42,7 @@ function RetentionCurve({ retention, duration, t }: { retention: number[]; durat
   );
 }
 
-export default function Report({ data, onAgain }: { data: RehearseResponse; onAgain: () => void }) {
+export default function Report({ data, onAgain, copyWarnings = [] }: { data: RehearseResponse; onAgain: () => void; copyWarnings?: string[] }) {
   const total = data.dots.length;
   const duration = data.timeline.durationS;
   const chunks = data.timeline.chunks;
@@ -98,6 +98,7 @@ export default function Report({ data, onAgain }: { data: RehearseResponse; onAg
         <p><b className="tagk">FIX</b> {todo.fix}</p>
         <p><b className="tagk">TEST</b> {todo.test}</p>
       </div>
+      {copyWarnings.map((w) => <p key={w} className="notice" style={{ marginTop: 14 }}>{w}</p>)}
       <h2 style={{ marginTop: 28 }}>The report</h2>
       <p className="headline">{data.headline}</p>
       {data.panel.note && <p className="notice">{data.panel.note}</p>}
