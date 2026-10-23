@@ -124,26 +124,25 @@ export default function Report({ data, onAgain }: { data: RehearseResponse; onAg
 
       <h2 style={{ marginTop: 28 }}>Each dot is one simulated viewer</h2>
       {isImage ? (
-        <>
-          <p className="help noprint">Two stages of viewing a still image.</p>
-          <div className="panel">
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              {stageLabels.map((label, stage) => (
-                <div key={stage} style={{ padding: 16, border: "1px solid var(--line)", borderRadius: 8, textAlign: "center" }}>
-                  <div style={{ marginBottom: 12 }}>
-                    <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.ceil(columns / 2)}, 1fr)`, gap: 3 }}>
-                      {data.dots.map((d, i) => (
-                        <i key={i} className={d.exitS !== null && d.exitS <= (stage + 1) * 3 ? "gone" : ""} style={{ aspectRatio: 1 }} />
-                      ))}
-                    </div>
-                  </div>
-                  <h4 style={{ margin: 0, marginBottom: 6 }}>{label}</h4>
-                  <p style={{ margin: 0, fontSize: 13, color: "var(--muted)" }}>{stage === 0 ? "Seconds 0–3" : "Seconds 3–6"}</p>
-                </div>
-              ))}
-            </div>
+        <div className="panel">
+          <p className="help noprint">Watch the two stages of viewing: click Play to see which viewers leave during each stage.</p>
+          <div className="seats" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }} aria-hidden="true">
+            {data.dots.map((d, i) => (
+              <i key={i} className={d.exitS !== null && d.exitS <= t ? "gone" : ""} />
+            ))}
           </div>
-        </>
+          <div className="scrub">
+            <button className="play" type="button" onClick={() => {
+              if (playing) { setPlaying(false); return; }
+              if (t >= 6) setT(0);
+              setPlaying(true);
+            }}>{playing ? "Pause" : "Play"}</button>
+            <input type="range" min={0} max={6} step={0.5} value={t} aria-label="Stage in the image"
+              onChange={(e) => { setPlaying(false); setT(parseFloat(e.target.value)); }} />
+            <span className="clock">{t <= 3 ? "First glance" : "Reading the offer"}</span>
+          </div>
+          <p className="count">{t <= 3 ? "After first glance (0–3s)" : "After reading (3–6s)"}: {still} of {total} still interested.</p>
+        </div>
       ) : (
         <div className="panel">
           <p className="help noprint">Drag the slider through the ad, or press Play, and watch who is still watching.</p>
