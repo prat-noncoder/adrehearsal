@@ -206,3 +206,14 @@ body[data-view="form"] .drop{padding:22px;border:2px solid transparent;border-ra
   background:linear-gradient(var(--field),var(--field)) padding-box,conic-gradient(from var(--ang),#FF6B4A,rgba(255,107,74,.08) 35%,rgba(255,107,74,.08) 60%,#FF6B4A) border-box;
   animation:turn 9s linear infinite}
 @media (prefers-reduced-motion:reduce){body[data-view="form"] .drop{animation:none}}
+
+/* Loading sequence: the dot grid drifts apart and regroups behind rotating phrases */
+.loading{position:relative;margin-top:24px;border-radius:12px;overflow:hidden;min-height:190px;display:flex;align-items:center;justify-content:center;background:var(--field,var(--bg));border:1px solid var(--line)}
+.loading .seats{position:absolute;inset:14px;margin:0;align-content:center;opacity:.55}
+.loading .seats i{background:var(--watch)}
+.drift{animation:drift 4.5s ease-in-out infinite;animation-delay:var(--dl)}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(var(--dx),var(--dy)) scale(.7)}}
+.phrase{position:relative;z-index:1;margin:0;font-size:24px;font-weight:800;letter-spacing:-.02em;text-align:center;padding:0 16px;animation:phrase 3.2s ease-in-out both;text-shadow:0 0 18px var(--bg),0 0 6px var(--bg)}
+@keyframes phrase{0%{opacity:0;transform:translateY(6px)}15%,80%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-6px)}}
+body[data-view="form"]{--watch:#5b616c}
+@media (prefers-reduced-motion:reduce){.drift,.phrase{animation:none}}

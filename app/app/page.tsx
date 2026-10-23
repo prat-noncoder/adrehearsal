@@ -19,6 +19,30 @@ const STATES = [
   "Telangana", "Uttar Pradesh", "Uttarakhand", "West Bengal",
 ];
 
+const PHRASES = ["Reading your ad...", "Scoring the panel...", "Watching where they stop...", "Writing what they'd say..."];
+const LOADING_DOTS = Array.from({ length: 160 }, (_, i) => {
+  const r = (n: number) => { const x = Math.sin(i * 12.9898 + n * 78.233) * 43758.5453; return x - Math.floor(x); };
+  return { dx: `${Math.round((r(1) - 0.5) * 90)}px`, dy: `${Math.round((r(2) - 0.5) * 70)}px`, delay: `${(r(3) * 3).toFixed(2)}s` };
+});
+
+function Loading() {
+  const [k, setK] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setK((n) => (n + 1) % PHRASES.length), 3200);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div className="loading" role="status" aria-live="polite">
+      <div className="seats" style={{ gridTemplateColumns: "repeat(20, 1fr)" }} aria-hidden="true">
+        {LOADING_DOTS.map((d, i) => (
+          <i key={i} className="drift" style={{ "--dx": d.dx, "--dy": d.dy, "--dl": d.delay } as React.CSSProperties} />
+        ))}
+      </div>
+      <p key={k} className="phrase">{PHRASES[k]}</p>
+    </div>
+  );
+}
+
 const AGE_STEPS = [18, 25, 35, 45, 55, 65];
 
 export default function Home() {
@@ -284,11 +308,7 @@ export default function Home() {
             )}
             <button className="go" type="button" disabled={!file || busy} onClick={run}>Run the rehearsal</button>
             {phase === "preparing" && <p className="status" role="status"><span className="pulse" aria-hidden="true" />Step 1 of 2: preparing your ad in this browser…</p>}
-            {phase === "running" && (
-              <p className="status" role="status">
-                <span className="pulse" aria-hidden="true" />Step 2 of 2: reading the ad, simulating {panelSize} viewers and writing the reasons. This usually takes 10 to 40 seconds ({elapsed}s so far).
-              </p>
-            )}
+            {phase === "running" && <Loading />}
             {error && (
               <div className="err" role="alert">
                 <b>{error.title}</b>
