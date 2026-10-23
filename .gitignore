@@ -14,3 +14,4 @@ node_modules/
 
 # Raw incoming files (labels may contain profile text; never commit)
 incoming/
+app/AGENTS.md
