@@ -37,6 +37,7 @@ export default function Home() {
   const [error, setError] = useState<{ title: string; message: string } | null>(null);
   const [data, setData] = useState<RehearseResponse | null>(null);
   const [audienceCount, setAudienceCount] = useState<number | null>(null);
+  const [bankStats, setBankStats] = useState<{ total: number; excluded: number } | null>(null);
   const reportTop = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -61,6 +62,13 @@ export default function Home() {
         });
         const json = await res.json();
         setAudienceCount(json.matched ?? 0);
+        const st = await fetch("/api/audience-stats", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ageMin, ageMax, genders, tier: tier ? [tier] : [], incomeGroup: income || undefined, states }),
+        });
+        const stJson = await st.json();
+        setBankStats(st.ok ? { total: stJson.total, excluded: stJson.excluded } : null);
       } catch {
         setAudienceCount(0);
       }
@@ -226,7 +234,9 @@ export default function Home() {
             </div>
             {audienceCount !== null && !busy && (
               <p className="help" style={{ marginTop: 16, marginBottom: 0, color: "var(--ink)" }}>
-                We found <strong>{audienceCount.toLocaleString()} people</strong> in our data matching these filters. We'll sample {panelSize} of them for this run.
+                <strong>{audienceCount.toLocaleString()}</strong>{bankStats ? ` of ${bankStats.total.toLocaleString()}` : ""} people in our data match these filters
+                {bankStats && bankStats.excluded > 0 ? ` (${bankStats.excluded.toLocaleString()} fit the filters but are left out because they\u2019re unlikely to be active on Instagram or Facebook)` : ""}.
+                {" "}We&rsquo;ll sample {panelSize.toLocaleString()} of them for this run.
               </p>
             )}
             {panelSize >= 5000 && (
