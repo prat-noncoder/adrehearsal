@@ -438,9 +438,11 @@ export async function rehearse(req: RehearseRequest, deps: RehearseDeps): Promis
   }
   // 2. Left later
   for (let k = 0; k < run.viewers.length; k++) {
-    if (run.exits[k] !== null && run.exits[k] > 0) {
+    const exitChunk = run.exits[k];
+    if (exitChunk !== null && exitChunk > 0) {
       const v = run.viewers[k];
-      const chunk = timeline.chunks[run.exits[k]];
+      // exitChunk is narrowed to number by the null check above
+      const chunk = timeline.chunks[exitChunk];
       viewers.push({
         scenario: "left-later",
         ageBand: v.person.ageband,
@@ -469,17 +471,23 @@ export async function rehearse(req: RehearseRequest, deps: RehearseDeps): Promis
   }
   // 4. Would tap
   for (let k = 0; k < run.viewers.length; k++) {
-    if (run.exits[k] === null && uniform(req.seed, STREAM.tap, run.viewers[k].person.index) < run.viewers[k].tapChance) {
-      const v = run.viewers[k];
-      viewers.push({
-        scenario: "would-tap",
-        ageBand: v.person.ageband,
-        gender: v.person.sex,
-        cityType: CITY_WORDS[v.person.tier] ?? v.person.tier,
-        incomeGroup: INCOME_WORDS[v.person.incomeLevel],
-        reason: "would tap to learn more",
-      });
-      break;
+    const v = run.viewers[k];
+    if (run.exits[k] === null) {
+      const tapChance = Math.min(
+        C.TAP_MAX,
+        Math.max(0, C.TAP_BASE_RATE * v.traits.clickGain * (C.TAP_RELEVANCE_FLOOR + v.relevance))
+      );
+      if (uniform(req.seed, STREAM.tap, v.person.index) < tapChance) {
+        viewers.push({
+          scenario: "would-tap",
+          ageBand: v.person.ageband,
+          gender: v.person.sex,
+          cityType: CITY_WORDS[v.person.tier] ?? v.person.tier,
+          incomeGroup: INCOME_WORDS[v.person.incomeLevel],
+          reason: "would tap to learn more",
+        });
+        break;
+      }
     }
   }
 

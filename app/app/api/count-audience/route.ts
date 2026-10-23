@@ -6,12 +6,13 @@ import * as C from "../../../lib/engine/constants.ts";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    const incomeKey = body.incomeGroup as "lower" | "middle" | "upper" | undefined;
     const filter: AudienceFilter = {
       ageBands: body.ageBands,
       sex: body.sex,
       states: body.states,
       tiers: body.tier,
-      incomeLevels: body.incomeGroup ? C.INCOME_GROUPS[body.incomeGroup] : undefined,
+      incomeLevels: incomeKey ? C.INCOME_GROUPS[incomeKey] : undefined,
     };
     const result = selectPanel(getBank(), filter, { size: 999999, seed: 1, excludeLowMeta: true });
     return Response.json({ matched: result.matched });
