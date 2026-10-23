@@ -16,7 +16,7 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
 h1,h2,h3{font-family:"Bricolage Grotesque","IBM Plex Sans",system-ui,sans-serif;line-height:1.12;margin:0}
 .wrap{max-width:880px;margin:0 auto;padding:0 20px 56px}
-.banner{background:var(--warn-bg);color:var(--warn-ink);padding:10px 20px;font-size:14px;border-bottom:1px solid var(--line)}
+.banner{background:var(--surface);color:var(--muted);padding:12px 20px;font-size:13px;border-bottom:1px solid var(--line)}
 .banner b{font-weight:600}
 header{padding:44px 0 26px}
 h1{font-size:clamp(30px,6vw,48px);font-weight:700;max-width:16ch;letter-spacing:-.01em}
