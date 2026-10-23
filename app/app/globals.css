@@ -107,3 +107,11 @@ details[open]>summary{margin-bottom:12px}
 .dual input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--line);border-radius:2px}
 .dual input[type=range]:nth-child(2)::-webkit-slider-runnable-track{background:transparent}
 .dual input[type=range]::-webkit-slider-thumb{pointer-events:auto;-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);border:2px solid #fff;box-shadow:var(--shadow);margin-top:-7px;cursor:pointer}
+.decision{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px}
+.decision p{margin:4px 0 0;font-size:clamp(19px,3vw,24px);font-weight:650;line-height:1.3;max-width:40ch}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.todo{margin-top:14px}
+.todo h2{font-size:18px;margin-bottom:10px}
+.todo p{margin:8px 0}
+.tagk{display:inline-block;min-width:52px;font-size:12px;letter-spacing:.06em;color:var(--muted)}
+.tagk.accent{color:var(--accent)}

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { RehearseResponse, ResponseGroup } from "../lib/rehearse.ts";
+import { decisionSentence, doThisNow } from "../lib/summaries.ts";
 
 const CAUSE_LABEL: Record<string, string> = {
   slow_open: "Slow opening",
@@ -77,6 +78,7 @@ export default function Report({ data, onAgain }: { data: RehearseResponse; onAg
     return [...m.entries()].sort((a, b) => a[0] - b[0]);
   }, [data.groups]);
 
+  const todo = doThisNow(data);
   const cost = data.costInfo.totalCostUsd;
   const tokens = [data.costInfo.readAd, data.costInfo.reasons].reduce(
     (n, p) => n + (p ? p.promptTokens + p.completionTokens : 0),
@@ -85,7 +87,17 @@ export default function Report({ data, onAgain }: { data: RehearseResponse; onAg
 
   return (
     <section id="report" aria-live="polite">
-      <h2>The report</h2>
+      <div className="decision">
+        <span className="eyebrow">Verdict</span>
+        <p>{decisionSentence(data)}</p>
+      </div>
+      <div className="panel todo">
+        <h2>Do this now</h2>
+        <p><b className="tagk accent">KEEP</b> {todo.keep}</p>
+        <p><b className="tagk">FIX</b> {todo.fix}</p>
+        <p><b className="tagk">TEST</b> {todo.test}</p>
+      </div>
+      <h2 style={{ marginTop: 28 }}>The report</h2>
       <p className="headline">{data.headline}</p>
       {data.panel.note && <p className="notice">{data.panel.note}</p>}
 
