@@ -68,6 +68,8 @@ export default function Report({ data, onAgain }: { data: RehearseResponse; onAg
   const midS = Math.ceil(chunks.length / 2) * 3;
   const showHold = chunks.length > 2;
   const nowWindow = Math.min(Math.floor(t / 3), chunks.length - 1);
+  const isImage = data.timeline.kind === "image";
+  const stageLabels = ["First glance", "Reading the offer"];
 
   const byWindow = useMemo(() => {
     const m = new Map<number, ResponseGroup[]>();
@@ -121,25 +123,48 @@ export default function Report({ data, onAgain }: { data: RehearseResponse; onAg
       </div>
 
       <h2 style={{ marginTop: 28 }}>Each dot is one simulated viewer</h2>
-      <p className="help noprint">Drag the slider through the ad, or press Play, and watch who is still watching.</p>
-      <div className="panel">
-        <div className="seats" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }} aria-hidden="true">
-          {data.dots.map((d, i) => (
-            <i key={i} className={d.exitS !== null && d.exitS <= t ? "gone" : ""} />
-          ))}
+      {isImage ? (
+        <>
+          <p className="help noprint">Two stages of viewing a still image.</p>
+          <div className="panel">
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              {stageLabels.map((label, stage) => (
+                <div key={stage} style={{ padding: 16, border: "1px solid var(--line)", borderRadius: 8, textAlign: "center" }}>
+                  <div style={{ marginBottom: 12 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.ceil(columns / 2)}, 1fr)`, gap: 3 }}>
+                      {data.dots.map((d, i) => (
+                        <i key={i} className={d.exitS !== null && d.exitS <= (stage + 1) * 3 ? "gone" : ""} style={{ aspectRatio: 1 }} />
+                      ))}
+                    </div>
+                  </div>
+                  <h4 style={{ margin: 0, marginBottom: 6 }}>{label}</h4>
+                  <p style={{ margin: 0, fontSize: 13, color: "var(--muted)" }}>{stage === 0 ? "Seconds 0–3" : "Seconds 3–6"}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="panel">
+          <p className="help noprint">Drag the slider through the ad, or press Play, and watch who is still watching.</p>
+          <div className="seats" style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }} aria-hidden="true">
+            {data.dots.map((d, i) => (
+              <i key={i} className={d.exitS !== null && d.exitS <= t ? "gone" : ""} />
+            ))}
+          </div>
+          <div className="scrub">
+            <button className="play" type="button" onClick={() => {
+              if (playing) { setPlaying(false); return; }
+              if (t >= duration) setT(0);
+              setPlaying(true);
+            }}>{playing ? "Pause" : "Play"}</button>
+            <input type="range" min={0} max={duration} step={0.5} value={t} aria-label="Seconds into the ad"
+              onChange={(e) => { setPlaying(false); setT(parseFloat(e.target.value)); }} />
+            <span className="clock">{clock(t)}</span>
+          </div>
+          <p className="count">At {clock(t)}, {still} of {total} are still watching.</p>
         </div>
-        <div className="scrub">
-          <button className="play" type="button" onClick={() => {
-            if (playing) { setPlaying(false); return; }
-            if (t >= duration) setT(0);
-            setPlaying(true);
-          }}>{playing ? "Pause" : "Play"}</button>
-          <input type="range" min={0} max={duration} step={0.5} value={t} aria-label="Seconds into the ad"
-            onChange={(e) => { setPlaying(false); setT(parseFloat(e.target.value)); }} />
-          <span className="clock">{clock(t)}</span>
-        </div>
-        <p className="count">At {clock(t)}, {still} of {total} are still watching.</p>
-      </div>
+      )}
 
       <h2 style={{ marginTop: 28 }}>Meet four simulated viewers</h2>
       <p className="help">Each is a typical example of their scenario. Simulated profiles, not real people.</p>
