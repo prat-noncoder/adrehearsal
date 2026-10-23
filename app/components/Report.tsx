@@ -78,6 +78,37 @@ export default function Report({ data, onAgain, copyWarnings = [] }: { data: Reh
     return [...m.entries()].sort((a, b) => a[0] - b[0]);
   }, [data.groups]);
 
+  const [pdfBusy, setPdfBusy] = useState(false);
+  async function downloadPdf() {
+    const el = document.getElementById("report");
+    if (!el) return;
+    setPdfBusy(true);
+    try {
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([import("html2canvas"), import("jspdf")]);
+      const bg = getComputedStyle(document.body).backgroundColor;
+      const canvas = await html2canvas(el, { scale: 2, backgroundColor: bg, ignoreElements: (n) => n.classList?.contains("noprint"), onclone: (doc) => doc.querySelectorAll("details").forEach((d) => { d.open = true; }) });
+      const pdf = new jsPDF({ unit: "pt", format: "a4" });
+      const pw = pdf.internal.pageSize.getWidth();
+      const ph = pdf.internal.pageSize.getHeight();
+      const imgH = (canvas.height * pw) / canvas.width;
+      const img = canvas.toDataURL("image/jpeg", 0.92);
+      for (let y = 0, page = 0; y < imgH; y += ph, page++) {
+        if (page > 0) pdf.addPage();
+        pdf.addImage(img, "JPEG", 0, -y, pw, imgH);
+      }
+      const url = URL.createObjectURL(pdf.output("blob"));
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "adrehearsal-report.pdf";
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    } finally {
+      setPdfBusy(false);
+    }
+  }
   const todo = doThisNow(data);
   const overall = data.panelComposition.watched / (total || 1);
   const cost = data.costInfo.totalCostUsd;
@@ -280,7 +311,7 @@ export default function Report({ data, onAgain, copyWarnings = [] }: { data: Reh
 
       <p className="footer">Simulated viewers. This explains likely problems. It does not predict sales.</p>
       <div className="actions noprint">
-        <button className="go" type="button" onClick={() => window.print()}>Download PDF</button>
+        <button className="go" type="button" disabled={pdfBusy} onClick={downloadPdf}>{pdfBusy ? "Building PDF…" : "Download PDF"}</button>
         <button className="ghost" type="button" onClick={onAgain}>Run again</button>
       </div>
     </section>
