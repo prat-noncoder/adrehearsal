@@ -180,14 +180,16 @@ export default function Report({ data, onAgain }: { data: RehearseResponse; onAg
         })}
       </div>
 
-      <h2 style={{ marginTop: 28 }}>Assumed in this run</h2>
-      <p className="help">Everything below is a starting guess or a limit of this version, not a measured fact.</p>
-      <div className="panel">
-        <ul className="assumed">
-          {data.assumptions.map((a) => (
-            <li key={a.title}><b>{a.title}.</b> {a.detail}</li>
-          ))}
-        </ul>
+      <div className="panel" style={{ marginTop: 28 }}>
+        <details>
+          <summary>ℹ️ Assumed in this run (expand to see)</summary>
+          <p className="help">Everything below is a starting guess or a limit of this version, not a measured fact.</p>
+          <ul className="assumed">
+            {data.assumptions.map((a) => (
+              <li key={a.title}><b>{a.title}.</b> {a.detail}</li>
+            ))}
+          </ul>
+        </details>
         <p className="small" style={{ marginTop: 12 }}>
           Panel: {data.panel.used} viewers used of {data.panel.requested} requested. Seed {data.seed} (the same ad and settings give the
           same result). AI model: {data.costInfo.model}.
