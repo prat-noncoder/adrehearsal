@@ -20,6 +20,8 @@ const STATES = [
   "Telangana", "Uttar Pradesh", "Uttarakhand", "West Bengal",
 ];
 
+const AGE_STEPS = [18, 25, 35, 45, 55, 65];
+
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [ageMin, setAgeMin] = useState(AGE_MIN);
@@ -176,15 +178,18 @@ export default function Home() {
                   </div>
                 )}
               </div>
-              <div className="field wide">
-                <span>Age: {ageMin} to {ageMax >= AGE_MAX ? `${AGE_MAX}+` : ageMax}</span>
-                <div className="dual">
-                  <input type="range" min={AGE_MIN} max={AGE_MAX} value={ageMin} disabled={busy} aria-label="Youngest age"
-                    onChange={(e) => setAgeMin(Math.min(Number(e.target.value), ageMax))} />
-                  <input type="range" min={AGE_MIN} max={AGE_MAX} value={ageMax} disabled={busy} aria-label="Oldest age"
-                    onChange={(e) => setAgeMax(Math.max(Number(e.target.value), ageMin))} />
-                </div>
-              </div>
+              <label>Age from
+                <select value={ageMin} disabled={busy}
+                  onChange={(e) => { const v = Number(e.target.value); setAgeMin(v); if (v > ageMax) setAgeMax(v); }}>
+                  {AGE_STEPS.map((a) => <option key={a} value={a}>{a >= AGE_MAX ? `${AGE_MAX}+` : a}</option>)}
+                </select>
+              </label>
+              <label>Age to
+                <select value={ageMax} disabled={busy}
+                  onChange={(e) => { const v = Number(e.target.value); setAgeMax(v); if (v < ageMin) setAgeMin(v); }}>
+                  {AGE_STEPS.map((a) => <option key={a} value={a}>{a >= AGE_MAX ? `${AGE_MAX}+` : a}</option>)}
+                </select>
+              </label>
               <div className="field">
                 <span>Gender</span>
                 <div className="chips">
