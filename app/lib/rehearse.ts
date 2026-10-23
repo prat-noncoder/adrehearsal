@@ -136,10 +136,20 @@ export interface CostPart {
   costUsd: number | null;
 }
 
+export interface PanelComposition {
+  ageGroups: Array<{ label: string; count: number }>;
+  genders: Array<{ label: string; count: number }>;
+  tiers: Array<{ label: string; count: number }>;
+  incomeGroups: Array<{ label: string; count: number }>;
+  leftIn3s: number;
+  watched: number;
+}
+
 export interface RehearseResponse {
   headline: string;
   timeline: Timeline;
   panel: { requested: number; used: number; note: string | null };
+  panelComposition: PanelComposition;
   funnel: { hook: number; hold: number; end: number; tap: number; tapEligible: number; tapAmongEligible: number };
   /** Share still watching at each whole second, from 0 to the end (curve between chunks is interpolated). */
   retention: number[];
@@ -370,6 +380,33 @@ export async function rehearse(req: RehearseRequest, deps: RehearseDeps): Promis
     headline += ` After the first 3 seconds, the biggest drop was at ${windowLabel(c.startS, c.endS)}: ${run.exitsByWindow[biggest]} people left${top ? `, most often because of ${CAUSE_WORDS[top.cause]}` : ""}.`;
   }
 
+  // Panel composition: demographics of the panel
+  const ageMap = new Map<string, number>();
+  const genderMap = new Map<string, number>();
+  const tierMap = new Map<string, number>();
+  const incomeMap = new Map<number, number>();
+  let leftIn3s = 0;
+  for (const v of run.viewers) {
+    ageMap.set(v.person.ageband, (ageMap.get(v.person.ageband) ?? 0) + 1);
+    genderMap.set(v.person.sex, (genderMap.get(v.person.sex) ?? 0) + 1);
+    tierMap.set(CITY_WORDS[v.person.tier] ?? v.person.tier, (tierMap.get(CITY_WORDS[v.person.tier] ?? v.person.tier) ?? 0) + 1);
+    incomeMap.set(v.person.incomeLevel, (incomeMap.get(v.person.incomeLevel) ?? 0) + 1);
+  }
+  for (const v of run.viewers) {
+    const k = run.viewers.indexOf(v);
+    if (run.exits[k] === 0) leftIn3s++; // Exited in first chunk (0-3 seconds)
+  }
+  const panelComposition: PanelComposition = {
+    ageGroups: Array.from(ageMap).map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count),
+    genders: Array.from(genderMap).map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count),
+    tiers: Array.from(tierMap).map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count),
+    incomeGroups: Array.from(incomeMap)
+      .map(([level, count]) => ({ label: INCOME_WORDS[level], count }))
+      .sort((a, b) => b.count - a.count),
+    leftIn3s,
+    watched: run.panel.used - leftIn3s,
+  };
+
   const readCost = usageToPart(ad.usage)!;
   const reasonCost = usageToPart(reasons.usage);
   const costs = [readCost.costUsd, reasonCost?.costUsd ?? null];
@@ -379,6 +416,7 @@ export async function rehearse(req: RehearseRequest, deps: RehearseDeps): Promis
     headline,
     timeline,
     panel: { requested: run.panel.requested, used: run.panel.used, note: run.panel.note },
+    panelComposition,
     funnel: {
       hook: f.hook,
       hold: f.holdMid,
