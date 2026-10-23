@@ -184,7 +184,7 @@ const CAUSE_WORDS: Record<Cause, string> = {
   lost_interest: "attention fading",
 };
 const CITY_WORDS: Record<string, string> = { metro: "big-city", urban_other: "other-town", rural: "rural" };
-const INCOME_WORDS: Record<number, string> = { 1: "lower", 2: "lower", 3: "middle", 4: "upper", 5: "upper" };
+const INCOME_WORDS: Record<number, string> = { 1: "lower", 2: "lower-middle", 3: "middle", 4: "upper-middle", 5: "upper" };
 
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 const windowLabel = (s: number, e: number) => `${s}-${e}s`;
