@@ -167,16 +167,23 @@ export default function Home() {
                   ))}
                   {states.length === 0 && <span className="small">All India</span>}
                 </div>
-                <input type="text" value={stateQuery} placeholder="Type to search states" disabled={busy}
-                  onChange={(e) => setStateQuery(e.target.value)} aria-label="Search states" />
-                {stateQuery && (
-                  <div className="chips">
-                    {STATES.filter((st) => !states.includes(st) && st.toLowerCase().includes(stateQuery.toLowerCase())).map((st) => (
-                      <button key={st} type="button" className="chip" disabled={busy}
-                        onClick={() => { setStates([...states, st]); setStateQuery(""); }}>+ {st}</button>
-                    ))}
-                  </div>
-                )}
+                <div className="combo">
+                  <input type="text" value={stateQuery} placeholder="Type to search states" disabled={busy}
+                    onChange={(e) => setStateQuery(e.target.value)} aria-label="Search states" autoComplete="off" />
+                  {stateQuery && (
+                    <ul className="suggest" role="listbox">
+                      {STATES.filter((st) => !states.includes(st) && st.toLowerCase().includes(stateQuery.toLowerCase())).map((st) => (
+                        <li key={st} role="option" aria-selected={false}>
+                          <button type="button" disabled={busy}
+                            onClick={() => { setStates([...states, st]); setStateQuery(""); }}>{st}</button>
+                        </li>
+                      ))}
+                      {STATES.filter((st) => !states.includes(st) && st.toLowerCase().includes(stateQuery.toLowerCase())).length === 0 && (
+                        <li className="none">No matching state</li>
+                      )}
+                    </ul>
+                  )}
+                </div>
               </div>
               <label>Age from
                 <select value={ageMin} disabled={busy}

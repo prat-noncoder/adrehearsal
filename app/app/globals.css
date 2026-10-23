@@ -122,3 +122,9 @@ details[open]>summary{margin-bottom:12px}
 .quote figcaption{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
 .badge{display:inline-block;align-self:flex-start;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:2px 10px;color:var(--ink)}
 .stopped{font-weight:600}
+.combo{position:relative}
+.combo input{width:100%}
+.suggest{position:absolute;z-index:20;left:0;right:0;top:calc(100% + 4px);margin:0;padding:4px;list-style:none;background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 20px rgba(26,26,26,.12);max-height:220px;overflow-y:auto}
+.suggest li button{display:block;width:100%;text-align:left;background:none;border:0;border-radius:6px;padding:8px 10px;color:var(--ink);font-size:14px}
+.suggest li button:hover,.suggest li button:focus-visible{background:var(--bg)}
+.suggest .none{padding:8px 10px;font-size:14px;color:var(--muted)}
