@@ -179,7 +179,11 @@ export default function Home() {
               </label>
               <label>Panel size
                 <select value={panelSize} onChange={(e) => setPanelSize(Number(e.target.value))} disabled={busy}>
-                  <option value={200}>200</option><option value={400}>400</option><option value={1000}>1,000</option>
+                  <option value={200}>200 (~6s)</option>
+                  <option value={400}>400 (~12s)</option>
+                  <option value={1000}>1,000 (~30s)</option>
+                  <option value={5000}>5,000 (~2.5 min)</option>
+                  <option value={20000}>All matching (up to 20,000) (~10 min)</option>
                 </select>
               </label>
             </div>
@@ -187,6 +191,9 @@ export default function Home() {
               <p className="help" style={{ marginTop: 16, marginBottom: 0, color: "var(--ink)" }}>
                 We found <strong>{audienceCount.toLocaleString()} people</strong> in our data matching these filters. We'll sample {panelSize} of them for this run.
               </p>
+            )}
+            {panelSize >= 5000 && (
+              <p className="notice" style={{ marginTop: 16 }}>Larger runs take longer and cost more. Pick a smaller size for a quick demo.</p>
             )}
             <button className="go" type="button" disabled={!file || busy} onClick={run}>Run the rehearsal</button>
             {phase === "preparing" && <p className="status" role="status">Step 1 of 2: preparing your ad in this browser…</p>}

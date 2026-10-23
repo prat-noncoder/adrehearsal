@@ -18,7 +18,7 @@ import type { Cause, Person, Timeline, Viewer } from "./engine/types.ts";
 export const AGE_BANDS = ["18-24", "25-34", "35-44", "45-59", "60+"];
 export const TIERS = ["metro", "urban_other", "rural"];
 export const PLACEMENTS = ["reels", "feed"];
-export const PANEL_SIZES = [200, 400, 1000];
+export const PANEL_SIZES = [200, 400, 1000, 5000, 20000];
 export type IncomeGroup = keyof typeof C.INCOME_GROUPS;
 export type Placement = "reels" | "feed";
 
