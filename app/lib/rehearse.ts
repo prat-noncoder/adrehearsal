@@ -145,6 +145,15 @@ export interface PanelComposition {
   watched: number;
 }
 
+export interface ViewerProfile {
+  scenario: "left-in-3s" | "left-later" | "watched-end" | "would-tap";
+  ageBand: string;
+  gender: string;
+  cityType: string;
+  incomeGroup: string;
+  reason: string;
+}
+
 export interface RehearseResponse {
   headline: string;
   timeline: Timeline;
@@ -160,6 +169,7 @@ export interface RehearseResponse {
   reasonsNote: string | null;
   assumptions: Assumption[];
   costInfo: { model: string; readAd: CostPart; reasons: CostPart | null; totalCostUsd: number | null };
+  viewers: ViewerProfile[];
   seed: number;
 }
 
@@ -409,6 +419,70 @@ export async function rehearse(req: RehearseRequest, deps: RehearseDeps): Promis
     watched: run.panel.used - leftIn3s,
   };
 
+  // Find four representative viewers
+  const viewers: ViewerProfile[] = [];
+  // 1. Left in first 3 seconds
+  for (let k = 0; k < run.viewers.length; k++) {
+    if (run.exits[k] === 0) {
+      const v = run.viewers[k];
+      viewers.push({
+        scenario: "left-in-3s",
+        ageBand: v.person.ageband,
+        gender: v.person.sex,
+        cityType: CITY_WORDS[v.person.tier] ?? v.person.tier,
+        incomeGroup: INCOME_WORDS[v.person.incomeLevel],
+        reason: groups.find((g) => g.startS === 0)?.reason ?? "lost interest",
+      });
+      break;
+    }
+  }
+  // 2. Left later
+  for (let k = 0; k < run.viewers.length; k++) {
+    if (run.exits[k] !== null && run.exits[k] > 0) {
+      const v = run.viewers[k];
+      const chunk = timeline.chunks[run.exits[k]];
+      viewers.push({
+        scenario: "left-later",
+        ageBand: v.person.ageband,
+        gender: v.person.sex,
+        cityType: CITY_WORDS[v.person.tier] ?? v.person.tier,
+        incomeGroup: INCOME_WORDS[v.person.incomeLevel],
+        reason: groups.find((g) => g.startS === chunk.startS)?.reason ?? "lost interest",
+      });
+      break;
+    }
+  }
+  // 3. Watched to end
+  for (let k = 0; k < run.viewers.length; k++) {
+    if (run.exits[k] === null) {
+      const v = run.viewers[k];
+      viewers.push({
+        scenario: "watched-end",
+        ageBand: v.person.ageband,
+        gender: v.person.sex,
+        cityType: CITY_WORDS[v.person.tier] ?? v.person.tier,
+        incomeGroup: INCOME_WORDS[v.person.incomeLevel],
+        reason: "watched to the end",
+      });
+      break;
+    }
+  }
+  // 4. Would tap
+  for (let k = 0; k < run.viewers.length; k++) {
+    if (run.exits[k] === null && uniform(req.seed, STREAM.tap, run.viewers[k].person.index) < run.viewers[k].tapChance) {
+      const v = run.viewers[k];
+      viewers.push({
+        scenario: "would-tap",
+        ageBand: v.person.ageband,
+        gender: v.person.sex,
+        cityType: CITY_WORDS[v.person.tier] ?? v.person.tier,
+        incomeGroup: INCOME_WORDS[v.person.incomeLevel],
+        reason: "would tap to learn more",
+      });
+      break;
+    }
+  }
+
   const readCost = usageToPart(ad.usage)!;
   const reasonCost = usageToPart(reasons.usage);
   const costs = [readCost.costUsd, reasonCost?.costUsd ?? null];
@@ -441,6 +515,7 @@ export async function rehearse(req: RehearseRequest, deps: RehearseDeps): Promis
       reasons: reasonCost,
       totalCostUsd: known.length ? known.reduce((a, b) => a + b, 0) : null,
     },
+    viewers,
     seed: req.seed,
   };
 }
