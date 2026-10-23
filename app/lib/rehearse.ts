@@ -17,15 +17,18 @@ import type { Cause, Person, Timeline, Viewer } from "./engine/types.ts";
 
 export const AGE_BANDS = ["18-24", "25-34", "35-44", "45-59", "60+"];
 export const TIERS = ["metro", "urban_other", "rural"];
+export const PLACEMENTS = ["reels", "feed"];
 export const PANEL_SIZES = [200, 400, 1000];
 export type IncomeGroup = keyof typeof C.INCOME_GROUPS;
+export type Placement = "reels" | "feed";
 
 export interface RehearseRequest {
   kind: "image" | "video";
   frames: AdFrame[];
-  audience: { ageBands?: string[]; sex?: "Male" | "Female"; tier?: string[]; incomeGroup?: IncomeGroup };
+  audience: { ageBands?: string[]; sex?: "Male" | "Female"; tier?: string[]; incomeGroup?: IncomeGroup; states?: string[] };
   panelSize: number;
   seed: number;
+  placement?: "reels" | "feed"; // "reels" (30% hook target) or "feed" (23% hook target), default "feed"
   /** Length of the original video if the browser knows it, to say when only the start was analysed. */
   videoDurationS?: number;
 }
@@ -79,6 +82,12 @@ export function parseRequest(body: unknown): RehearseRequest {
     if (typeof a.incomeGroup !== "string" || !(a.incomeGroup in C.INCOME_GROUPS)) throw new RequestError("Unknown income group.");
     audience.incomeGroup = a.incomeGroup as IncomeGroup;
   }
+  if (a.states !== undefined) {
+    if (!Array.isArray(a.states) || !a.states.every((x) => typeof x === "string")) {
+      throw new RequestError("States must be an array of strings.");
+    }
+    if (a.states.length) audience.states = a.states as string[];
+  }
 
   const panelSize = body.panelSize === undefined ? C.PANEL_DEFAULT : body.panelSize;
   if (typeof panelSize !== "number" || !PANEL_SIZES.includes(panelSize)) {
@@ -88,7 +97,15 @@ export function parseRequest(body: unknown): RehearseRequest {
   if (typeof seed !== "number" || !Number.isInteger(seed)) throw new RequestError("Seed must be a whole number.");
   const videoDurationS = typeof body.videoDurationS === "number" && body.videoDurationS > 0 ? body.videoDurationS : undefined;
 
-  return { kind, frames, audience, panelSize, seed, videoDurationS };
+  let placement: Placement = "feed";
+  if (body.placement !== undefined) {
+    if (typeof body.placement !== "string" || !PLACEMENTS.includes(body.placement)) {
+      throw new RequestError("Placement must be 'reels' or 'feed'.");
+    }
+    placement = body.placement as Placement;
+  }
+
+  return { kind, frames, audience, panelSize, seed, videoDurationS, placement };
 }
 
 // ---------- Response ----------
@@ -193,6 +210,9 @@ function buildAssumptions(req: RehearseRequest, viewers: Viewer[], timeline: Tim
     .map(([m, p]) => `${m.replace(/_/g, " ")} ${pct(p)}`)
     .join(", ");
   const labelled = viewers.filter((v) => v.person.ai).length;
+  const placement = req.placement || "feed";
+  const targetHook = C.HOOK_TARGET[placement];
+  const placementLabel = placement === "reels" ? "Instagram Reels" : "Instagram Feed or Facebook Feed";
   const list: Assumption[] = [
     {
       title: "Moods (assumed)",
@@ -207,8 +227,8 @@ function buildAssumptions(req: RehearseRequest, viewers: Viewer[], timeline: Tim
       detail: "Income level (1 to 5) is assigned by a formula, not measured. The lower, middle and upper groups used for the audience filter are assumed groupings of those levels.",
     },
     {
-      title: "Exit settings (assumed)",
-      detail: `The chance of leaving rises with skip habit, low attention, friction that matters to the viewer, low relevance and fatigue. The hook constant (${base0.toFixed(2)}) is calibrated so a neutral reference ad has a ${pct(C.HOOK_TARGET.reels)} hook, a rough third-party Reels figure that is not India-specific. Later chunks use a base of ${C.BASE_HAZARD_LATER_CHUNKS} (assumed).`,
+      title: "Exit settings (assumed, not India-specific)",
+      detail: `The chance of leaving rises with skip habit, low attention, friction that matters to the viewer, low relevance and fatigue. The hook constant (${base0.toFixed(2)}) is calibrated so a neutral reference ad has a ${pct(targetHook)} hook on ${placementLabel} (a rough third-party figure, not India-specific). Later chunks use a base of ${C.BASE_HAZARD_LATER_CHUNKS} (assumed).`,
     },
     {
       title: "Relevance (assumed)",
@@ -257,6 +277,7 @@ export async function rehearse(req: RehearseRequest, deps: RehearseDeps): Promis
   const filter: AudienceFilter = {
     ageBands: req.audience.ageBands,
     sex: req.audience.sex,
+    states: req.audience.states,
     tiers: req.audience.tier,
     incomeLevels: req.audience.incomeGroup ? C.INCOME_GROUPS[req.audience.incomeGroup] : undefined,
   };

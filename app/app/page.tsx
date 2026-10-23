@@ -8,17 +8,30 @@ import type { RehearseResponse } from "../lib/rehearse.ts";
 
 type Phase = "idle" | "preparing" | "running" | "done" | "error";
 
+const STATES = [
+  "Andaman & Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar",
+  "Chandigarh", "Chhattisgarh", "Dadra & Nagar Haveli", "Daman & Diu", "Delhi",
+  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu & Kashmir",
+  "Jharkhand", "Karnataka", "Kerala", "Lakshadweep", "Madhya Pradesh",
+  "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland",
+  "Odisha", "Puducherry", "Punjab", "Rajasthan", "Sikkim",
+  "Telangana", "Uttar Pradesh", "Uttarakhand", "West Bengal",
+];
+
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [age, setAge] = useState("");
   const [sex, setSex] = useState("");
   const [tier, setTier] = useState("");
   const [income, setIncome] = useState("");
+  const [placement, setPlacement] = useState<"reels" | "feed">("feed");
+  const [state, setState] = useState("");
   const [panelSize, setPanelSize] = useState(400);
   const [phase, setPhase] = useState<Phase>("idle");
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState<{ title: string; message: string } | null>(null);
   const [data, setData] = useState<RehearseResponse | null>(null);
+  const [audienceCount, setAudienceCount] = useState<number | null>(null);
   const reportTop = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,8 +72,10 @@ export default function Home() {
             sex: sex || undefined,
             tier: tier ? [tier] : [],
             incomeGroup: income || undefined,
+            states: state ? [state] : [],
           },
           panelSize,
+          placement,
           seed: 1,
         }),
       });
@@ -109,6 +124,16 @@ export default function Home() {
               <span className="fileNote">{file ? `Chosen: ${file.name}` : "No file chosen."}</span>
             </div>
             <div className="fields">
+              <label>Where will it run? (assumed, not India-specific)
+                <select value={placement} onChange={(e) => setPlacement(e.target.value as "reels" | "feed")} disabled={busy}>
+                  <option value="feed">Instagram Feed or Facebook Feed (23% hook target)</option><option value="reels">Instagram Reels (30% hook target)</option>
+                </select>
+              </label>
+              <label>State
+                <select value={state} onChange={(e) => setState(e.target.value)} disabled={busy}>
+                  <option value="">All India</option>{STATES.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </label>
               <label>Age
                 <select value={age} onChange={(e) => setAge(e.target.value)} disabled={busy}>
                   <option value="">Any</option><option>18-24</option><option>25-34</option><option>35-44</option><option>45-59</option><option>60+</option>

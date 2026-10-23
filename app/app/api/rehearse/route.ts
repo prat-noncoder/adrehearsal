@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 
   try {
     const req = parseRequest(body);
-    const result = await rehearse(req, { bank: getBank(), base0: getBase0() });
+    const result = await rehearse(req, { bank: getBank(), base0: getBase0(req.placement) });
     return Response.json(result);
   } catch (e) {
     if (e instanceof RequestError) return fail(400, "bad_request", e.message);

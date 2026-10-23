@@ -133,8 +133,11 @@ export const BASE_0_SEARCH_MIN = 0;
 export const BASE_0_SEARCH_MAX = 50;
 
 // ---------- Calibration ----------
-// Hook = share still watching at second 3. Rough third-party ranges, NOT India-specific.
-export const HOOK_TARGET = { reels: 0.3, feed: 0.23 };
+// Hook = share still watching at second 3. Rough third-party ranges, NOT India-specific (ASSUMED).
+export const HOOK_TARGET = {
+  reels: 0.3, // Instagram Reels, third-party benchmark
+  feed: 0.23, // Instagram Feed and Facebook Feed, third-party benchmark
+};
 // The reference ad used to find base_0 has one hook chunk with this salience and no friction. ASSUMED.
 export const REFERENCE_HOOK_SALIENCE = 0.6;
 // Size of the reference panel (drawn from the whole bank) used to calibrate. ASSUMED.
